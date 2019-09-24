@@ -1,0 +1,452 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.describe &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyprecag.errors" href="pyprecag.errors.html" />
+    <link rel="prev" title="pyprecag.crs" href="pyprecag.crs.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.bandops.html">pyprecag.bandops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.config.html">pyprecag.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.convert.html">pyprecag.convert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.crs.html">pyprecag.crs</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pyprecag.describe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.errors.html">pyprecag.errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.kriging_ops.html">pyprecag.kriging_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.processing.html">pyprecag.processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.raster_ops.html">pyprecag.raster_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.table_ops.html">pyprecag.table_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.vector_ops.html">pyprecag.vector_ops</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+        
+      <li>pyprecag.describe</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/reference/pyprecag.describe.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pyprecag.describe">
+<span id="pyprecag-describe"></span><h1>pyprecag.describe<a class="headerlink" href="#module-pyprecag.describe" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pyprecag.describe.CsvDescribe">
+<em class="property">class </em><code class="descclassname">pyprecag.describe.</code><code class="descname">CsvDescribe</code><span class="sig-paren">(</span><em>csv_filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#CsvDescribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.CsvDescribe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyprecag.describe.CsvDescribe.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>csv_filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#CsvDescribe.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.CsvDescribe.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>A description of key elements relating to a comma or tab delimited text file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>csv_filename</strong> (<em>str</em>) – a comma or tab delimited text</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.CsvDescribe.describe_file">
+<code class="descname">describe_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#CsvDescribe.describe_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.CsvDescribe.describe_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describe a CSV File and set class properties</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.CsvDescribe.get_alias_column_names">
+<code class="descname">get_alias_column_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#CsvDescribe.get_alias_column_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.CsvDescribe.get_alias_column_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.CsvDescribe.get_column_names">
+<code class="descname">get_column_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#CsvDescribe.get_column_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.CsvDescribe.get_column_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.CsvDescribe.get_column_types">
+<code class="descname">get_column_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#CsvDescribe.get_column_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.CsvDescribe.get_column_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.CsvDescribe.get_pandas_dataframe_fromfile">
+<code class="descname">get_pandas_dataframe_fromfile</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#CsvDescribe.get_pandas_dataframe_fromfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.CsvDescribe.get_pandas_dataframe_fromfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.CsvDescribe.get_shapefile_column_names">
+<code class="descname">get_shapefile_column_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#CsvDescribe.get_shapefile_column_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.CsvDescribe.get_shapefile_column_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.CsvDescribe.open_pandas_dataframe">
+<code class="descname">open_pandas_dataframe</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#CsvDescribe.open_pandas_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.CsvDescribe.open_pandas_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.CsvDescribe.set_pandas_dataframe">
+<code class="descname">set_pandas_dataframe</code><span class="sig-paren">(</span><em>pandas_dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#CsvDescribe.set_pandas_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.CsvDescribe.set_pandas_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyprecag.describe.VectorDescribe">
+<em class="property">class </em><code class="descclassname">pyprecag.describe.</code><code class="descname">VectorDescribe</code><span class="sig-paren">(</span><em>input_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#VectorDescribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.VectorDescribe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyprecag.describe.VectorDescribe.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>input_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#VectorDescribe.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.VectorDescribe.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a description for a vector file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_data</strong> (<em>str</em>) – The input file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.VectorDescribe.describeFile">
+<code class="descname">describeFile</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#VectorDescribe.describeFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.VectorDescribe.describeFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describe a vector File and set class properties</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.VectorDescribe.get_alias_column_names">
+<code class="descname">get_alias_column_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#VectorDescribe.get_alias_column_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.VectorDescribe.get_alias_column_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.VectorDescribe.get_column_names">
+<code class="descname">get_column_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#VectorDescribe.get_column_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.VectorDescribe.get_column_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.VectorDescribe.get_column_types">
+<code class="descname">get_column_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#VectorDescribe.get_column_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.VectorDescribe.get_column_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.VectorDescribe.get_shapefile_names">
+<code class="descname">get_shapefile_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#VectorDescribe.get_shapefile_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.VectorDescribe.get_shapefile_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.describe.VectorDescribe.open_geo_dataframe">
+<code class="descname">open_geo_dataframe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#VectorDescribe.open_geo_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.VectorDescribe.open_geo_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create geopandas from file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.describe.get_column_properties">
+<code class="descclassname">pyprecag.describe.</code><code class="descname">get_column_properties</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#get_column_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.get_column_properties" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Get a dictionary representing Column Properties for a pandas dataframe or a geopandas geodataframe.</dt>
+<dd><dl class="first last docutils">
+<dt>Includes:</dt>
+<dd><blockquote class="first">
+<div>alias - removes spaces and replaces unicode chars with a sensible string using unidecode. ie oC to degC
+shapefile - An ESRI compatible 10 char alpha-numeric (excludes ‘-‘ &amp; ‘_’) column name.
+type - The fiona compatible column type
+dtype - The Pandas/Geopandas compatible column type.</div></blockquote>
+<p class="last">At Present it does not store the column width precision etc.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dataframe</strong> (<em>[</em><em>pandas.core.frame.DataFrame</em><em> or </em><em>geopandas.geodataframe.GeoDataFrame</em><em>]</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Representing properties of a column.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">collections.OrderedDict</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>TODO: Consider converting to a dictionary class with the get_shapefile_column_names etc</dt>
+<dd>see: <a class="reference external" href="https://stackoverflow.com/questions/1305532/convert-python-dict-to-object">https://stackoverflow.com/questions/1305532/convert-python-dict-to-object</a></dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.describe.get_dataframe_encoding">
+<code class="descclassname">pyprecag.describe.</code><code class="descname">get_dataframe_encoding</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#get_dataframe_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.get_dataframe_encoding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.describe.get_esri_shapefile_schema">
+<code class="descclassname">pyprecag.describe.</code><code class="descname">get_esri_shapefile_schema</code><span class="sig-paren">(</span><em>inputGeoDataFrame</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#get_esri_shapefile_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.get_esri_shapefile_schema" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Construct an esri compatible schema for use with fiona.</dt>
+<dd><ul class="first last simple">
+<li>remaps to fiona dtypes</li>
+<li>Adheres to ESRI column naming standards  - 10 alpha numeric characters including ‘_’ underscore.</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>inputGeoDataFrame</strong> (<em>geopandas.GeoDataframe</em>) – </td>
+</tr>
+</tbody>
+</table>
+<p>Returns (dict): A Fiona compatible Dictionary</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.describe.predictCoordinateColumnNames">
+<code class="descclassname">pyprecag.describe.</code><code class="descname">predictCoordinateColumnNames</code><span class="sig-paren">(</span><em>column_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#predictCoordinateColumnNames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.predictCoordinateColumnNames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the Longitude/easting and latitude/northing columns from a list of column_names</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>column_names</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – A list of column names</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">[xColumn,yColumn]   Best matched column names</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">List[str]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.describe.save_geopandas_tofile">
+<code class="descclassname">pyprecag.describe.</code><code class="descname">save_geopandas_tofile</code><span class="sig-paren">(</span><em>inputGeoDataFrame</em>, <em>output_filename</em>, <em>overwrite=True</em>, <em>file_encoding='ascii'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/describe.html#save_geopandas_tofile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.describe.save_geopandas_tofile" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Save a geodataframe to file.</dt>
+<dd><ul class="first last simple">
+<li>adds functionality to asses and rename columns to ESRI compatible 10 alpha-numeric characters.</li>
+<li>Maps lists and boolean column types to string.</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>inputGeoDataFrame</strong> (<em>geopandas.geodataframe.GeoDataFrame</em>) – The Geodataframe to save</li>
+<li><strong>output_filename</strong> (<em>str</em>) – The output filename</li>
+<li><strong>overwrite</strong> (<em>bool</em>) – Overwrite Existing file</li>
+<li><strong>file_encoding</strong> (<em>str</em>) – encoding type for output file.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pyprecag.errors.html" class="btn btn-neutral float-right" title="pyprecag.errors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pyprecag.crs.html" class="btn btn-neutral float-left" title="pyprecag.crs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

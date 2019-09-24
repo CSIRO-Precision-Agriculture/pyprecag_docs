@@ -1,0 +1,466 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.crs &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyprecag.describe" href="pyprecag.describe.html" />
+    <link rel="prev" title="pyprecag.convert" href="pyprecag.convert.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.bandops.html">pyprecag.bandops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.config.html">pyprecag.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.convert.html">pyprecag.convert</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pyprecag.crs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.describe.html">pyprecag.describe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.errors.html">pyprecag.errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.kriging_ops.html">pyprecag.kriging_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.processing.html">pyprecag.processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.raster_ops.html">pyprecag.raster_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.table_ops.html">pyprecag.table_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.vector_ops.html">pyprecag.vector_ops</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+        
+      <li>pyprecag.crs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/reference/pyprecag.crs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pyprecag.crs">
+<span id="pyprecag-crs"></span><h1>pyprecag.crs<a class="headerlink" href="#module-pyprecag.crs" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pyprecag.crs.crs">
+<em class="property">class </em><code class="descclassname">pyprecag.crs.</code><code class="descname">crs</code><a class="reference internal" href="../_modules/pyprecag/crs.html#crs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.crs.crs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyprecag.crs.crs.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/crs.html#crs.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.crs.crs.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.crs.crs.getEPSGFromSRS">
+<code class="descname">getEPSGFromSRS</code><span class="sig-paren">(</span><em>osr_srs</em>, <em>bOnlineLookup=False</em>, <em>bUpdateToCorrectDefn=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/crs.html#crs.getEPSGFromSRS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.crs.crs.getEPSGFromSRS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the EPSG number for a Spatial Reference System.</p>
+<blockquote>
+<div><p>If the Spatial reference system does not contain an EPSG number it will attempt to find one.</p>
+<p>If bOnlineLookup is set to True it will use the online lookup service at  <a class="reference external" href="http://prj2epsg.org">http://prj2epsg.org</a> to attempt to
+identify the EPSG. This service will return a list of potential EPSG numbers. If a direct match is not found,
+then it will return None.</p>
+<p>If bOnlineLookup is set to False OR the online lookup fails, then it will attempt to match the input
+spatial reference system by looping through the list and attempting a proj4 string match if this still fails,
+then it will attempt a match to australian projected coordinate system</p>
+<p>adapted from : <a class="reference external" href="https://gis.stackexchange.com/a/8888">https://gis.stackexchange.com/a/8888</a></p>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>osr_srs</strong> (<em>osgeo.osr.SpatialReference</em>) – </li>
+<li><strong>bOnlineLookup</strong> (<em>bool</em>) – Use the Open Geo Lookup Service</li>
+<li><strong>bUpdateToCorrectDefn</strong> (<em>bool</em>) – overwrite existing with the found definition</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">EPSG Number for the matched Spatial Reference System.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.crs.crs.getFromEPSG">
+<code class="descname">getFromEPSG</code><span class="sig-paren">(</span><em>epsg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/crs.html#crs.getFromEPSG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.crs.crs.getFromEPSG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create OGR Spatial Reference Object for an epsg_number number
+:param epsg: A Valid EPSG Number
+:type epsg: int</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The Spatial Reference Object for the input EPSG</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">osgeo.osr.SpatialReference</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.crs.crs.getFromWKT">
+<code class="descname">getFromWKT</code><span class="sig-paren">(</span><em>crs_wkt</em>, <em>bUpdateByEPSG=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/crs.html#crs.getFromWKT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.crs.crs.getFromWKT" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Get crs attributes via a coordinate systems WKT.</dt>
+<dd>Used for gathering coordinate system attributes from fiona.crs.crs_wkt.
+If the EPSG number can be determined, bUpdateByEPSG provides the option to update the proj4, crs_wkt and
+SRS attributes to match the official EPSG database attributes</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>crs_wkt</strong> (<em>unicode</em>) – A string representing the coordinate system well known text</li>
+<li><strong>bUpdateByEPSG</strong> (<em>bool</em>) – If True and the epsg_number is predicted, overwrite crs attributes with those from
+official epsg_number database.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.crs.crs.set_epsg">
+<code class="descname">set_epsg</code><span class="sig-paren">(</span><em>code</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/crs.html#crs.set_epsg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.crs.crs.set_epsg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an integer code, set the epsg_number and the EPSG-like mapping.</p>
+<p>Note: the input code is not validated against an EPSG database.
+:param code: An integer representing the EPSG code
+:type code: int</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.crs.distance_metres_to_dd">
+<code class="descclassname">pyprecag.crs.</code><code class="descname">distance_metres_to_dd</code><span class="sig-paren">(</span><em>longitude</em>, <em>latitude</em>, <em>distance_metres</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/crs.html#distance_metres_to_dd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.crs.distance_metres_to_dd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a distance in metres to decimal degrees. It presumes the longitude/lats are in WGS84.</p>
+<dl class="docutils">
+<dt>Workflow -&gt; using a Long/Lat, reproject to UTM</dt>
+<dd>-&gt; Add distance to the easting
+-&gt; reproject back to WGS84.
+-&gt; Calculate distance between the two sets of coordinates.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>longitude</strong> (<em>float</em>) – a floating number representing longitude</li>
+<li><strong>latitude</strong> (<em>float</em>) – a floating number representing latitude</li>
+<li><strong>distance_metres</strong> (<em>float</em>) – a distance in metres to convert.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the distance in decimal degrees.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.crs.getCRSfromRasterFile">
+<code class="descclassname">pyprecag.crs.</code><code class="descname">getCRSfromRasterFile</code><span class="sig-paren">(</span><em>raster_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/crs.html#getCRSfromRasterFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.crs.getCRSfromRasterFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a CRS object from a raster file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>raster_file</strong> (<em>str</em>) – The path and filename to a raster file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An object representing the raster file’s coordinate system.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyprecag.crs.crs" title="pyprecag.crs.crs">pyprecag.crs.crs</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.crs.getCoordTransformation">
+<code class="descclassname">pyprecag.crs.</code><code class="descname">getCoordTransformation</code><span class="sig-paren">(</span><em>inSR</em>, <em>outSR</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/crs.html#getCoordTransformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.crs.getCoordTransformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the coordinate transformation between two input spatial references
+:param inSR: Input Spatial Reference System
+:type inSR: osgeo.osr.SpatialReference
+:param outSR: Output Spatial Reference System
+:type outSR: osgeo.osr.SpatialReference</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The Coordinate Transformation object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">osgeo.osr.CoordinateTransformation</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.crs.getProjectedCRSForXY">
+<code class="descclassname">pyprecag.crs.</code><code class="descname">getProjectedCRSForXY</code><span class="sig-paren">(</span><em>x_coord</em>, <em>y_coord</em>, <em>xy_epsg=4326</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/crs.html#getProjectedCRSForXY"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.crs.getProjectedCRSForXY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the Zonal projected coordinate system from a set of xy coordinates.</p>
+<p>Coordinates will be reprojected to geographics wgs84(4326) if required to identify the correct
+projected coordinate system.</p>
+<p>utm for WGS84 is selected as it is global, and wgs84 is commonly used as the GPS coordinate system.</p>
+<p>If input coordinates are within Australia the result will be in Map Grid of Australia(MGA) GDA 1994 coordinate
+system, otherwise the appropriate zonal utm WGS84 projected coordinate system will be used.</p>
+<dl class="docutils">
+<dt>This is useful for</dt>
+<dd><ul class="first last simple">
+<li>converting decimal degrees to metres for area perimeter etc.</li>
+<li>converting sUTM to GDA mga</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x_coord</strong> (<em>float</em>) – A floating number representing an easting, x or longitude</li>
+<li><strong>y_coord</strong> (<em>float</em>) – A floating number representing a northing, y or latitude</li>
+<li><strong>xy_epsg</strong> (<em>int</em>) – The epsg_number for the x_coord &amp; y_coord coordinates.
+This could geographic(WGS84, or GDA94) or projected(UTM or MGA GDA)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A pyprecag.crs object defining the WGS84 Zone Projected Coordinate System</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pyprecag.crs</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.crs.getUTMfromWGS84">
+<code class="descclassname">pyprecag.crs.</code><code class="descname">getUTMfromWGS84</code><span class="sig-paren">(</span><em>longitude</em>, <em>latitude</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/crs.html#getUTMfromWGS84"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.crs.getUTMfromWGS84" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the UTM Zonal projection from a set of lats&amp;longs</p>
+<p>This is useful for converting  decimal degrees to metres for area perimeter etc.
+utm for WGS84 is selected as it is global, and wgs84 is commonly used as the GPS coordinate system.</p>
+<p>It will return the zone, and the spatial reference objects for the utm &amp; wgs84 projections required
+for coordinate or feature transformation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>longitude</strong> (<em>float</em>) – a floating number representing longitude</li>
+<li><strong>latitude</strong> (<em>float</em>) – a floating number representing latitude</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">UTM Zone, utm SRS, WGS84 SRS</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Tuple[int, osgeo.osr.SpatialReference, osgeo.osr.SpatialReference]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pyprecag.describe.html" class="btn btn-neutral float-right" title="pyprecag.describe" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pyprecag.convert.html" class="btn btn-neutral float-left" title="pyprecag.convert" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

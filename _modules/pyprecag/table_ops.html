@@ -1,0 +1,325 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.table_ops &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyprecag.table_ops</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyprecag.table_ops</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">geopandas</span> <span class="k">import</span> <span class="n">GeoDataFrame</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">stats</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">TEMPDIR</span>
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">LOGGER</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="t_test"><a class="viewcode-back" href="../../reference/pyprecag.table_ops.html#pyprecag.table_ops.t_test">[docs]</a><span class="k">def</span> <span class="nf">t_test</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Moving window t-test function.</span>
+<span class="sd">        to get two columns in to the function, one must be set as the index.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            input_table = input_table.set_index(treatment_column, drop=False)</span>
+
+<span class="sd">            input_table[&#39;p_value&#39;] = input_table[&#39;controls_mean&#39;].rolling(</span>
+<span class="sd">                window=size, center=True).apply(t_test, raw=False)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">tstat</span><span class="p">,</span> <span class="n">pvalue</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">ttest_rel</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pvalue</span></div>
+
+
+<div class="viewcode-block" id="response_index"><a class="viewcode-back" href="../../reference/pyprecag.table_ops.html#pyprecag.table_ops.response_index">[docs]</a><span class="k">def</span> <span class="nf">response_index</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Moving window response index function</span>
+<span class="sd">        to get two columns in to the function, one must be set as the index.</span>
+<span class="sd">        Example:</span>
+<span class="sd">            input_table = input_table.set_index(treatment_column, drop=False)</span>
+<span class="sd">            input_table[&#39;RI&#39;] = input_table[&#39;controls_mean&#39;].rolling(</span>
+<span class="sd">                window=size, center=True).apply(response_index, raw=False)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">idx_s</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">idx_s</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">/</span> <span class="n">arr</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="calculate_strip_stats"><a class="viewcode-back" href="../../reference/pyprecag.table_ops.html#pyprecag.table_ops.calculate_strip_stats">[docs]</a><span class="k">def</span> <span class="nf">calculate_strip_stats</span><span class="p">(</span><span class="n">input_table</span><span class="p">,</span> <span class="n">treatment_column</span><span class="p">,</span> <span class="n">control_columns</span><span class="o">=</span><span class="p">[],</span> <span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate statistics for a strip</span>
+
+<span class="sd">    A moving window is used for some of the statistics. This window is centred so for a window</span>
+<span class="sd">    size of 5, 2 NAN or blanks will be added to start and end of the output column.</span>
+
+<span class="sd">    Statistics include (output column names):</span>
+<span class="sd">        controls_mean  - row by row mean of the control columns</span>
+<span class="sd">        treat_diff -   row by row difference between the treatment and controls_mean columns</span>
+<span class="sd">        av_treat_diff - calculate mean of values using a moving window using the treat_diff column</span>
+<span class="sd">        p_value - calculate p_value using a moving window using treatment and controls_mean columns</span>
+<span class="sd">        RI  - Response Index using the treatment and controls_mean columns</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_table (pandas.core.frame.DataFrame): the table to calculate statistics for</span>
+<span class="sd">        treatment_column (str): The column containing the treatment values</span>
+<span class="sd">        control_columns (List[str]): The column containing the control values.</span>
+<span class="sd">                                     This can be one or two columns</span>
+<span class="sd">        size (int):The size of the moving window.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.core.frame.DataFrame: The output table containing new statistics columns</span>
+<span class="sd">        control_mean (str): The column used as the control mean.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_table</span><span class="p">,</span> <span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="c1"># drop geometry etc. and create flat table.</span>
+        <span class="n">input_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">input_table</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;geometry&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control_columns</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;control_columns should be a list.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">treatment_column</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;treatment_column should be a string.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">treatment_column</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">treatment_column</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid treatment column&#39;</span><span class="p">)</span>
+
+    <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">ea</span> <span class="k">for</span> <span class="n">ea</span> <span class="ow">in</span> <span class="p">[</span><span class="n">treatment_column</span><span class="p">]</span> <span class="o">+</span> <span class="n">control_columns</span>
+               <span class="k">if</span> <span class="n">ea</span> <span class="ow">and</span> <span class="n">ea</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">input_table</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;columns not found - </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">),</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)))</span>
+
+    <span class="n">input_table</span> <span class="o">=</span> <span class="n">input_table</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="sd">&#39;&#39;&#39; Statistics ----------------------------------------------------------------- &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">control_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># calculate the mean for the column(s)</span>
+        <span class="n">control_mean</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">control_columns</span><span class="p">)</span>
+        <span class="n">control_mean</span> <span class="o">=</span> <span class="n">control_mean</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; Strip Value&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">control_mean</span> <span class="o">=</span> <span class="n">control_mean</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; Strip Control&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">control_mean</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_mean&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">control_mean</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="n">input_table</span><span class="p">[</span><span class="n">control_mean</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_table</span><span class="p">[</span><span class="n">control_columns</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">control_mean</span> <span class="o">=</span> <span class="n">control_columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># calculate the difference</span>
+    <span class="n">input_table</span><span class="p">[</span><span class="s1">&#39;treat_diff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_table</span><span class="p">[</span><span class="n">treatment_column</span><span class="p">]</span> <span class="o">-</span> <span class="n">input_table</span><span class="p">[</span><span class="n">control_mean</span><span class="p">]</span>
+
+    <span class="c1"># Moving Mean for values diff</span>
+    <span class="n">input_table</span><span class="p">[</span><span class="s1">&#39;av_treat_dif&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_table</span><span class="p">[</span><span class="s1">&#39;treat_diff&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="sd">&#39;&#39;&#39; Rolling window using two-tailed paired student t-test</span>
+<span class="sd">        https://pythonfordatascience.org/paired-samples-t-test-python/ </span>
+<span class="sd">        https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_rel.html </span>
+<span class="sd">        https://stackoverflow.com/a/52029516</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">input_table</span> <span class="o">=</span> <span class="n">input_table</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">treatment_column</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">input_table</span><span class="p">[</span><span class="s1">&#39;p_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_table</span><span class="p">[</span><span class="n">control_mean</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span>
+        <span class="n">window</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">t_test</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">input_table</span><span class="p">[</span><span class="s1">&#39;RI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_table</span><span class="p">[</span><span class="n">control_mean</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span>
+        <span class="n">window</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">response_index</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># reset index</span>
+    <span class="n">input_table</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;TrialPtID&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">input_table</span><span class="p">,</span> <span class="n">control_mean</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

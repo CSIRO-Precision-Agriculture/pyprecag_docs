@@ -1,0 +1,662 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.crs &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyprecag.crs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyprecag.crs</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">urllib</span> <span class="k">import</span> <span class="n">urlencode</span>
+<span class="kn">import</span> <span class="nn">urllib2</span>
+
+<span class="kn">from</span> <span class="nn">fiona.crs</span> <span class="k">import</span> <span class="n">from_string</span><span class="p">,</span> <span class="n">from_epsg</span>
+<span class="kn">from</span> <span class="nn">osgeo</span> <span class="k">import</span> <span class="n">osr</span><span class="p">,</span> <span class="n">gdal</span>
+<span class="kn">from</span> <span class="nn">shapely</span> <span class="k">import</span> <span class="n">geometry</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="k">import</span> <span class="n">SpatialReferenceError</span>
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">LOGGER</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>  <span class="c1"># Handle logging, no logging has been configured</span>
+<span class="c1"># LOGGER.setLevel(&quot;DEBUG&quot;)</span>
+<span class="c1"># DEBUG = config.get_debug_mode()  # LOGGER.isEnabledFor(logging.DEBUG)</span>
+
+
+<div class="viewcode-block" id="crs"><a class="viewcode-back" href="../../reference/pyprecag.crs.html#pyprecag.crs.crs">[docs]</a><span class="k">class</span> <span class="nc">crs</span><span class="p">:</span>
+<div class="viewcode-block" id="crs.__init__"><a class="viewcode-back" href="../../reference/pyprecag.crs.html#pyprecag.crs.crs.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srs</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Spatial Reference Object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crs_wkt</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proj4</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsg_number</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsg_predicted</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Did the epsg_number get set via the online lookup.</span></div>
+
+<div class="viewcode-block" id="crs.set_epsg"><a class="viewcode-back" href="../../reference/pyprecag.crs.html#pyprecag.crs.crs.set_epsg">[docs]</a>    <span class="k">def</span> <span class="nf">set_epsg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given an integer code, set the epsg_number and the EPSG-like mapping.</span>
+
+<span class="sd">         Note: the input code is not validated against an EPSG database.</span>
+<span class="sd">         Args:</span>
+<span class="sd">            code (int): An integer representing the EPSG code</span>
+
+<span class="sd">         &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;EPSG Code is None and cant be set.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">code</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;EPSG code must be a positive integer&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;EPSG Code must be a positive integer&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;EPSG Code must be a positive integer&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsg</span> <span class="o">=</span> <span class="n">from_epsg</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsg_number</span> <span class="o">=</span> <span class="n">code</span></div>
+
+<div class="viewcode-block" id="crs.getFromWKT"><a class="viewcode-back" href="../../reference/pyprecag.crs.html#pyprecag.crs.crs.getFromWKT">[docs]</a>    <span class="k">def</span> <span class="nf">getFromWKT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs_wkt</span><span class="p">,</span> <span class="n">bUpdateByEPSG</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get crs attributes via a coordinate systems WKT.</span>
+<span class="sd">            Used for gathering coordinate system attributes from fiona.crs.crs_wkt.</span>
+<span class="sd">            If the EPSG number can be determined, bUpdateByEPSG provides the option to update the proj4, crs_wkt and</span>
+<span class="sd">            SRS attributes to match the official EPSG database attributes</span>
+<span class="sd">        Args:</span>
+<span class="sd">            crs_wkt (unicode):    A string representing the coordinate system well known text</span>
+<span class="sd">            bUpdateByEPSG (bool): If True and the epsg_number is predicted, overwrite crs attributes with those from</span>
+<span class="sd">                                  official epsg_number database.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">crs_wkt</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;crs_wkt is blank. No coordinate information set&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">source</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">SpatialReference</span><span class="p">()</span>
+        <span class="n">source</span><span class="o">.</span><span class="n">ImportFromWkt</span><span class="p">(</span><span class="n">crs_wkt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">crs_wkt</span> <span class="o">=</span> <span class="n">crs_wkt</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">srs</span> <span class="o">=</span> <span class="n">source</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proj4</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">ExportToProj4</span><span class="p">()</span>
+
+            <span class="n">source</span><span class="o">.</span><span class="n">AutoIdentifyEPSG</span><span class="p">()</span>
+
+            <span class="n">code</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">GetAuthorityCode</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">code</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getEPSGFromSRS</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">bOnlineLookup</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bUpdateToCorrectDefn</span><span class="o">=</span><span class="n">bUpdateByEPSG</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">code</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">GetAuthorityCode</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">code</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_epsg</span><span class="p">(</span><span class="n">code</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="crs.getFromEPSG"><a class="viewcode-back" href="../../reference/pyprecag.crs.html#pyprecag.crs.crs.getFromEPSG">[docs]</a>    <span class="k">def</span> <span class="nf">getFromEPSG</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create OGR Spatial Reference Object for an epsg_number number</span>
+<span class="sd">        Args:</span>
+<span class="sd">            epsg (int):    A Valid EPSG Number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            osgeo.osr.SpatialReference: The Spatial Reference Object for the input EPSG</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">epsg</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">unicode</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">epsg</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">epsg</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;EPSG:&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;EPSG must be a number. Got - </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epsg</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">epsg</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;EPSG must be a number. Got - </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epsg</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">epsg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">epsg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">srs_obj</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">SpatialReference</span><span class="p">()</span>
+        <span class="n">srs_obj</span><span class="o">.</span><span class="n">ImportFromEPSG</span><span class="p">(</span><span class="n">epsg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">srs_obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">srs</span> <span class="o">=</span> <span class="n">srs_obj</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">crs_wkt</span> <span class="o">=</span> <span class="n">srs_obj</span><span class="o">.</span><span class="n">ExportToWkt</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proj4</span> <span class="o">=</span> <span class="n">srs_obj</span><span class="o">.</span><span class="n">ExportToProj4</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_epsg</span><span class="p">(</span><span class="n">epsg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">epsg_predicted</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="crs.getEPSGFromSRS"><a class="viewcode-back" href="../../reference/pyprecag.crs.html#pyprecag.crs.crs.getEPSGFromSRS">[docs]</a>    <span class="k">def</span> <span class="nf">getEPSGFromSRS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">osr_srs</span><span class="p">,</span> <span class="n">bOnlineLookup</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">bUpdateToCorrectDefn</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the EPSG number for a Spatial Reference System.</span>
+
+<span class="sd">           If the Spatial reference system does not contain an EPSG number it will attempt to find one.</span>
+
+<span class="sd">           If bOnlineLookup is set to True it will use the online lookup service at  http://prj2epsg.org to attempt to</span>
+<span class="sd">           identify the EPSG. This service will return a list of potential EPSG numbers. If a direct match is not found,</span>
+<span class="sd">           then it will return None.</span>
+
+<span class="sd">           If bOnlineLookup is set to False OR the online lookup fails, then it will attempt to match the input</span>
+<span class="sd">           spatial reference system by looping through the list and attempting a proj4 string match if this still fails,</span>
+<span class="sd">           then it will attempt a match to australian projected coordinate system</span>
+
+<span class="sd">           adapted from : https://gis.stackexchange.com/a/8888</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            osr_srs (osgeo.osr.SpatialReference):</span>
+<span class="sd">            bOnlineLookup (bool): Use the Open Geo Lookup Service</span>
+<span class="sd">            bUpdateToCorrectDefn (bool): overwrite existing with the found definition</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            int: EPSG Number for the matched Spatial Reference System.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">osr_srs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">orig_srs</span> <span class="o">=</span> <span class="n">osr_srs</span><span class="o">.</span><span class="n">Clone</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="n">osr_srs</span><span class="o">.</span><span class="n">AutoIdentifyEPSG</span><span class="p">()</span>
+            <span class="n">epsg</span> <span class="o">=</span> <span class="n">osr_srs</span><span class="o">.</span><span class="n">GetAuthorityCode</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">epsg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">epsg</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">epsg</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">epsg</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="k">if</span> <span class="n">epsg</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">epsg</span>
+
+            <span class="c1"># For the second loop try the after using MorphFromESRI</span>
+            <span class="n">osr_srs</span><span class="o">.</span><span class="n">MorphFromESRI</span><span class="p">()</span>
+
+        <span class="c1"># reset back to original to undo MorphFromESRI</span>
+        <span class="n">osr_srs</span> <span class="o">=</span> <span class="n">orig_srs</span><span class="o">.</span><span class="n">Clone</span><span class="p">()</span>
+
+        <span class="c1"># Then through a lookup</span>
+        <span class="k">if</span> <span class="n">epsg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">bOnlineLookup</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">epsg_predicted</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">urlencode</span><span class="p">({</span>
+                <span class="s1">&#39;exact&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="s1">&#39;wkt&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;terms&#39;</span><span class="p">:</span> <span class="n">osr_srs</span><span class="o">.</span><span class="n">ExportToWkt</span><span class="p">()})</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">webres</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">crsURL</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_config_key</span><span class="p">(</span><span class="s1">&#39;crsLookupURL&#39;</span><span class="p">)</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Checking against OpenGeo service (</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crsURL</span><span class="p">))</span>
+
+                <span class="n">webres</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">crsURL</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Connection to </span><span class="si">{}</span><span class="s1"> Successful&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crsURL</span><span class="p">))</span>
+
+            <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;WARNING: OpenGeo service (</span><span class="si">{}</span><span class="s1">) could not be reached. Timeout after 10 seconds &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crsURL</span><span class="p">))</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;WARNING: OpenGeo service (</span><span class="si">{}</span><span class="s1">) could not be reached. Timeout after 10 seconds &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crsURL</span><span class="p">))</span>
+
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;WARNING: OpenGeo service (</span><span class="si">{}</span><span class="s1">) could not be reached. &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crsURL</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">webres</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">jres</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">webres</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">epsg</span> <span class="o">=</span> <span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;code&#39;</span><span class="p">]</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Matched to EPSG </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;code&#39;</span><span class="p">],</span> <span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">epsg_predicted</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">EPSG lookup found </span><span class="si">{}</span><span class="s1"> matches. Attempting to refine by comparing proj4 strings&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">])))</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">]))):</span>
+                        <span class="n">epsg</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="n">tmpSrs</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">SpatialReference</span><span class="p">()</span>
+                        <span class="n">res</span> <span class="o">=</span> <span class="n">tmpSrs</span><span class="o">.</span><span class="n">ImportFromEPSG</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;code&#39;</span><span class="p">]))</span>
+
+                        <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;: could not import from EPSG&#39;</span><span class="p">)</span>
+
+                        <span class="c1"># create a dictionary mapping using fiona.crs.from_string to ensure elements are in</span>
+                        <span class="c1"># the same order.</span>
+                        <span class="n">tmpProj4Dict</span> <span class="o">=</span> <span class="n">from_string</span><span class="p">(</span><span class="n">tmpSrs</span><span class="o">.</span><span class="n">ExportToProj4</span><span class="p">())</span>
+
+                        <span class="k">if</span> <span class="n">from_string</span><span class="p">(</span><span class="n">osr_srs</span><span class="o">.</span><span class="n">ExportToProj4</span><span class="p">())</span> <span class="o">==</span> <span class="n">tmpProj4Dict</span><span class="p">:</span>
+                            <span class="n">epsg</span> <span class="o">=</span> <span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;code&#39;</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># remove towgs84 value if all 0&#39;s as it is not always implemented yet for gda2020</span>
+                            <span class="k">if</span> <span class="s1">&#39;towgs84&#39;</span> <span class="ow">in</span> <span class="n">tmpProj4Dict</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">tmpProj4Dict</span><span class="p">[</span><span class="s1">&#39;towgs84&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;0,0,0,0,0,0,0&#39;</span><span class="p">:</span>
+                                    <span class="k">del</span> <span class="n">tmpProj4Dict</span><span class="p">[</span><span class="s1">&#39;towgs84&#39;</span><span class="p">]</span>
+
+                            <span class="k">if</span> <span class="n">from_string</span><span class="p">(</span><span class="n">osr_srs</span><span class="o">.</span><span class="n">ExportToProj4</span><span class="p">())</span> <span class="o">==</span> <span class="n">tmpProj4Dict</span><span class="p">:</span>
+                                <span class="n">epsg</span> <span class="o">=</span> <span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;code&#39;</span><span class="p">]</span>
+
+                        <span class="k">if</span> <span class="n">epsg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="k">del</span> <span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">epsg</span> <span class="o">=</span> <span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;code&#39;</span><span class="p">]</span>
+                        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Refined match returns EPSG </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;code&#39;</span><span class="p">],</span>
+                                                                               <span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">mess</span> <span class="o">=</span> <span class="s1">&#39;ERROR:-EPSG lookup found </span><span class="si">{}</span><span class="s1"> matches. Please properly define the projection &#39;</span> \
+                               <span class="s1">&#39;and try again.</span><span class="se">\n</span><span class="s1">The matches were:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">]))</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">])):</span>
+                            <span class="n">mess</span> <span class="o">=</span> <span class="n">mess</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="si">{0:&gt;7}</span><span class="s1">    </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;code&#39;</span><span class="p">],</span> <span class="n">jres</span><span class="p">[</span><span class="s1">&#39;codes&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+                        <span class="k">raise</span> <span class="n">SpatialReferenceError</span><span class="p">(</span><span class="n">mess</span><span class="p">)</span>
+
+        <span class="c1"># if still none, then attempt to map for common aussie prj&#39;s only</span>
+        <span class="k">if</span> <span class="n">epsg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">epsg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">epsg_predicted</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">osr_srs</span><span class="o">.</span><span class="n">IsProjected</span><span class="p">():</span>
+                <span class="n">srsName</span> <span class="o">=</span> <span class="n">osr_srs</span><span class="o">.</span><span class="n">GetAttrValue</span><span class="p">(</span><span class="s2">&quot;PROJCS&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">srsName</span> <span class="o">=</span> <span class="n">osr_srs</span><span class="o">.</span><span class="n">GetAttrValue</span><span class="p">(</span><span class="s2">&quot;GEOGCS&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Attempting to map </span><span class="si">{}</span><span class="s1"> to Australian GDA projections and WGS84.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">srsName</span><span class="p">),</span> <span class="p">)</span>
+            <span class="c1"># TODO: Implement GDA2020</span>
+            <span class="k">if</span> <span class="n">osr_srs</span><span class="o">.</span><span class="n">IsProjected</span><span class="p">()</span> <span class="ow">and</span> <span class="s1">&#39;GDA&#39;</span> <span class="ow">in</span> <span class="n">srsName</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">and</span> <span class="s1">&#39;MGA&#39;</span> <span class="ow">in</span> <span class="n">srsName</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
+                <span class="n">epsg</span> <span class="o">=</span> <span class="mi">28300</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">srsName</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="k">elif</span> <span class="n">srsName</span> <span class="o">==</span> <span class="s1">&#39;GCS_WGS_1984&#39;</span><span class="p">:</span>
+                <span class="n">epsg</span> <span class="o">=</span> <span class="mi">4326</span>
+            <span class="k">elif</span> <span class="n">srsName</span> <span class="o">==</span> <span class="s1">&#39;GCS_GDA_1994&#39;</span><span class="p">:</span>
+                <span class="n">epsg</span> <span class="o">=</span> <span class="mi">4283</span>
+            <span class="k">if</span> <span class="n">epsg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">epsg</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;WARNING: No EPSG match found&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Aussie match found: EPSG:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epsg</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">bUpdateToCorrectDefn</span> <span class="ow">and</span> <span class="n">epsg</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getFromEPSG</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">epsg</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">epsg</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="getCRSfromRasterFile"><a class="viewcode-back" href="../../reference/pyprecag.crs.html#pyprecag.crs.getCRSfromRasterFile">[docs]</a><span class="k">def</span> <span class="nf">getCRSfromRasterFile</span><span class="p">(</span><span class="n">raster_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a CRS object from a raster file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        raster_file (str): The path and filename to a raster file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pyprecag.crs.crs: An object representing the raster file&#39;s coordinate system.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gdalRaster</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">raster_file</span><span class="p">))</span>
+    <span class="n">rast_crs</span> <span class="o">=</span> <span class="n">crs</span><span class="p">()</span>
+    <span class="n">rast_crs</span><span class="o">.</span><span class="n">getFromWKT</span><span class="p">(</span><span class="n">gdalRaster</span><span class="o">.</span><span class="n">GetProjectionRef</span><span class="p">())</span>
+    <span class="k">del</span> <span class="n">gdalRaster</span>
+    <span class="k">return</span> <span class="n">rast_crs</span></div>
+
+
+<div class="viewcode-block" id="getCoordTransformation"><a class="viewcode-back" href="../../reference/pyprecag.crs.html#pyprecag.crs.getCoordTransformation">[docs]</a><span class="k">def</span> <span class="nf">getCoordTransformation</span><span class="p">(</span><span class="n">inSR</span><span class="p">,</span> <span class="n">outSR</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the coordinate transformation between two input spatial references</span>
+<span class="sd">    Args:</span>
+<span class="sd">        inSR (osgeo.osr.SpatialReference): Input Spatial Reference System</span>
+<span class="sd">        outSR (osgeo.osr.SpatialReference): Output Spatial Reference System</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        osgeo.osr.CoordinateTransformation:  The Coordinate Transformation object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">osr</span><span class="o">.</span><span class="n">CoordinateTransformation</span><span class="p">(</span><span class="n">inSR</span><span class="p">,</span> <span class="n">outSR</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getUTMfromWGS84"><a class="viewcode-back" href="../../reference/pyprecag.crs.html#pyprecag.crs.getUTMfromWGS84">[docs]</a><span class="k">def</span> <span class="nf">getUTMfromWGS84</span><span class="p">(</span><span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculate the UTM Zonal projection from a set of lats&amp;longs</span>
+
+<span class="sd">    This is useful for converting  decimal degrees to metres for area perimeter etc.</span>
+<span class="sd">    utm for WGS84 is selected as it is global, and wgs84 is commonly used as the GPS coordinate system.</span>
+
+<span class="sd">    It will return the zone, and the spatial reference objects for the utm &amp; wgs84 projections required</span>
+<span class="sd">    for coordinate or feature transformation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        longitude (float): a floating number representing longitude</span>
+<span class="sd">        latitude (float): a floating number representing latitude</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[int, osgeo.osr.SpatialReference, osgeo.osr.SpatialReference]: UTM Zone, utm SRS, WGS84 SRS</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Based On :https://stackoverflow.com/a/10239676</span>
+    <span class="k">def</span> <span class="nf">get_utm_zone</span><span class="p">(</span><span class="n">longitude</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">longitude</span> <span class="o">+</span> <span class="mf">180.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_northern</span><span class="p">(</span><span class="n">latitude</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines if given latitude is a northern for UTM</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">latitude</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="n">utm_crs</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">SpatialReference</span><span class="p">()</span>
+    <span class="n">utm_crs</span><span class="o">.</span><span class="n">SetWellKnownGeogCS</span><span class="p">(</span><span class="s2">&quot;WGS84&quot;</span><span class="p">)</span>  <span class="c1"># Set geographic coordinate system to handle latitude/longitude</span>
+    <span class="n">zone</span> <span class="o">=</span> <span class="n">get_utm_zone</span><span class="p">(</span><span class="n">longitude</span><span class="p">)</span>
+    <span class="n">utm_crs</span><span class="o">.</span><span class="n">SetUTM</span><span class="p">(</span><span class="n">get_utm_zone</span><span class="p">(</span><span class="n">longitude</span><span class="p">),</span> <span class="n">is_northern</span><span class="p">(</span><span class="n">latitude</span><span class="p">))</span>
+    <span class="n">wgs84_crs</span> <span class="o">=</span> <span class="n">utm_crs</span><span class="o">.</span><span class="n">CloneGeogCS</span><span class="p">()</span>  <span class="c1"># Clone ONLY the geographic coordinate system</span>
+
+    <span class="k">return</span> <span class="n">zone</span><span class="p">,</span> <span class="n">utm_crs</span><span class="p">,</span> <span class="n">wgs84_crs</span></div>
+
+
+<div class="viewcode-block" id="getProjectedCRSForXY"><a class="viewcode-back" href="../../reference/pyprecag.crs.html#pyprecag.crs.getProjectedCRSForXY">[docs]</a><span class="k">def</span> <span class="nf">getProjectedCRSForXY</span><span class="p">(</span><span class="n">x_coord</span><span class="p">,</span> <span class="n">y_coord</span><span class="p">,</span> <span class="n">xy_epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculate the Zonal projected coordinate system from a set of xy coordinates.</span>
+
+<span class="sd">        Coordinates will be reprojected to geographics wgs84(4326) if required to identify the correct</span>
+<span class="sd">        projected coordinate system.</span>
+
+<span class="sd">        utm for WGS84 is selected as it is global, and wgs84 is commonly used as the GPS coordinate system.</span>
+
+<span class="sd">        If input coordinates are within Australia the result will be in Map Grid of Australia(MGA) GDA 1994 coordinate</span>
+<span class="sd">        system, otherwise the appropriate zonal utm WGS84 projected coordinate system will be used.</span>
+
+<span class="sd">        This is useful for</span>
+<span class="sd">            - converting decimal degrees to metres for area perimeter etc.</span>
+<span class="sd">            - converting sUTM to GDA mga</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x_coord (float): A floating number representing an easting, x or longitude</span>
+<span class="sd">            y_coord (float): A floating number representing a northing, y or latitude</span>
+<span class="sd">            xy_epsg (int): The epsg_number for the x_coord &amp; y_coord coordinates.</span>
+<span class="sd">                               This could geographic(WGS84, or GDA94) or projected(UTM or MGA GDA)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pyprecag.crs : A pyprecag.crs object defining the WGS84 Zone Projected Coordinate System</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c1"># Based On :https://stackoverflow.com/a/10239676</span>
+    <span class="kn">from</span> <span class="nn">pyproj</span> <span class="k">import</span> <span class="n">Proj</span><span class="p">,</span> <span class="n">transform</span>
+
+    <span class="c1"># Coordinates need to be in wgs84 so project them</span>
+    <span class="k">if</span> <span class="n">xy_epsg</span> <span class="o">!=</span> <span class="mi">4326</span><span class="p">:</span>
+        <span class="n">inProj</span> <span class="o">=</span> <span class="n">Proj</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="s1">&#39;epsg:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xy_epsg</span><span class="p">))</span>
+        <span class="n">outProj</span> <span class="o">=</span> <span class="n">Proj</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="s1">&#39;epsg:4326&#39;</span><span class="p">)</span>
+        <span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">inProj</span><span class="p">,</span> <span class="n">outProj</span><span class="p">,</span> <span class="n">x_coord</span><span class="p">,</span> <span class="n">y_coord</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span> <span class="o">=</span> <span class="n">x_coord</span><span class="p">,</span> <span class="n">y_coord</span>
+
+    <span class="n">utm_zone</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">longitude</span> <span class="o">+</span> <span class="mf">180.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">)</span>
+
+    <span class="c1"># Determines if given latitude is a northern for UTM        1 is northern, 0 is southern</span>
+    <span class="n">is_northern</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">latitude</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="n">utm_crs</span> <span class="o">=</span> <span class="n">crs</span><span class="p">()</span>
+    <span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">SpatialReference</span><span class="p">()</span>
+
+    <span class="c1"># Use Australian or New Zealand local systems otherwise use global wgs84 UTM zones.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="mf">108.0</span> <span class="o">&lt;=</span> <span class="n">longitude</span> <span class="o">&lt;=</span> <span class="mf">155.0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="o">-</span><span class="mf">45.0</span> <span class="o">&lt;=</span> <span class="n">latitude</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">):</span>
+        <span class="c1"># set to Australian GDA94 MGA Zone XX</span>
+        <span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span><span class="o">.</span><span class="n">ImportFromEPSG</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="s1">&#39;283</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">utm_zone</span><span class="p">)))</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="mf">166.33</span> <span class="o">&lt;=</span> <span class="n">longitude</span> <span class="o">&lt;=</span> <span class="mf">178.6</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="o">-</span><span class="mf">47.4</span> <span class="o">&lt;=</span> <span class="n">latitude</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mf">34.0</span><span class="p">):</span>
+        <span class="c1"># set to NZGD2000 / New Zealand Transverse Mercator 2000</span>
+        <span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span><span class="o">.</span><span class="n">ImportFromEPSG</span><span class="p">(</span><span class="mi">2193</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Set to Global WGS84 Utm Zone.</span>
+        <span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span><span class="o">.</span><span class="n">SetWellKnownGeogCS</span><span class="p">(</span><span class="s2">&quot;WGS84&quot;</span><span class="p">)</span>
+        <span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span><span class="o">.</span><span class="n">SetUTM</span><span class="p">(</span><span class="n">utm_zone</span><span class="p">,</span> <span class="n">is_northern</span><span class="p">)</span>
+        <span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span><span class="o">.</span><span class="n">AutoIdentifyEPSG</span><span class="p">()</span>
+
+    <span class="n">utm_crs</span><span class="o">.</span><span class="n">set_epsg</span><span class="p">(</span><span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span><span class="o">.</span><span class="n">GetAuthorityCode</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+
+    <span class="n">utm_crs</span><span class="o">.</span><span class="n">epsg_predicted</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">utm_crs</span><span class="o">.</span><span class="n">crs_wkt</span> <span class="o">=</span> <span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span><span class="o">.</span><span class="n">ExportToWkt</span><span class="p">()</span>
+    <span class="n">utm_crs</span><span class="o">.</span><span class="n">proj4</span> <span class="o">=</span> <span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span><span class="o">.</span><span class="n">ExportToProj4</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span><span class="o">.</span><span class="n">IsProjected</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">utm_crs</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="distance_metres_to_dd"><a class="viewcode-back" href="../../reference/pyprecag.crs.html#pyprecag.crs.distance_metres_to_dd">[docs]</a><span class="k">def</span> <span class="nf">distance_metres_to_dd</span><span class="p">(</span><span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">distance_metres</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Converts a distance in metres to decimal degrees. It presumes the longitude/lats are in WGS84.</span>
+
+<span class="sd">    Workflow -&gt; using a Long/Lat, reproject to UTM</span>
+<span class="sd">             -&gt; Add distance to the easting</span>
+<span class="sd">             -&gt; reproject back to WGS84.</span>
+<span class="sd">             -&gt; Calculate distance between the two sets of coordinates.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        longitude (float): a floating number representing longitude</span>
+<span class="sd">        latitude (float): a floating number representing latitude</span>
+<span class="sd">        distance_metres (float): a distance in metres to convert.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: the distance in decimal degrees.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">argCheck</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="n">longitude</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="n">latitude</span><span class="p">)]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> must be a floating number.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">distance_metres</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;distance_metres must be a floating number.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># get the required Spatial reference systems</span>
+    <span class="n">utm_crs</span> <span class="o">=</span> <span class="n">getProjectedCRSForXY</span><span class="p">(</span><span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span><span class="p">)</span>
+    <span class="n">wgs84SRS</span> <span class="o">=</span>  <span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span><span class="o">.</span><span class="n">CloneGeogCS</span><span class="p">()</span>
+    <span class="c1"># zone, utmSRS, wgs84SRS = getUTMfromWGS84(longitude, latitude)</span>
+
+    <span class="c1"># create transform component</span>
+    <span class="n">wgs842utm_transform</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">CoordinateTransformation</span><span class="p">(</span><span class="n">wgs84SRS</span><span class="p">,</span> <span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span><span class="p">)</span>  <span class="c1"># (&lt;from&gt;, &lt;to&gt;)</span>
+    <span class="c1"># Project to UTM</span>
+    <span class="n">easting</span><span class="p">,</span> <span class="n">northing</span><span class="p">,</span> <span class="n">alt</span> <span class="o">=</span> <span class="n">wgs842utm_transform</span><span class="o">.</span><span class="n">TransformPoint</span><span class="p">(</span><span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># create transform component</span>
+    <span class="n">utm2wgs84_transform</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">CoordinateTransformation</span><span class="p">(</span><span class="n">utm_crs</span><span class="o">.</span><span class="n">srs</span><span class="p">,</span> <span class="n">wgs84SRS</span><span class="p">)</span>  <span class="c1"># (&lt;from&gt;, &lt;to&gt;)</span>
+
+    <span class="c1"># Project back to WGS84 after adding distance to eastings. returns easting, northing, altitude</span>
+    <span class="n">newLong</span><span class="p">,</span> <span class="n">newLat</span><span class="p">,</span> <span class="n">alt</span> <span class="o">=</span> <span class="n">utm2wgs84_transform</span><span class="o">.</span><span class="n">TransformPoint</span><span class="p">(</span><span class="n">easting</span> <span class="o">+</span> <span class="n">distance_metres</span><span class="p">,</span> <span class="n">northing</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Create a point objects.</span>
+    <span class="n">origPoint</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span><span class="p">)</span>
+    <span class="n">adjPoint</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">newLong</span><span class="p">,</span> <span class="n">newLat</span><span class="p">)</span>
+
+    <span class="c1"># Calculate Distance</span>
+    <span class="n">distance_dd</span> <span class="o">=</span> <span class="n">origPoint</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">adjPoint</span><span class="p">)</span>
+
+    <span class="c1"># if the input was negative make sure the output is too</span>
+    <span class="k">if</span> <span class="n">distance_metres</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">distance_dd</span> <span class="o">=</span> <span class="o">-</span><span class="n">distance_dd</span>
+
+    <span class="k">return</span> <span class="n">distance_dd</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

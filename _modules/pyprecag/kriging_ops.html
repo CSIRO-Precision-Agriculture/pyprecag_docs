@@ -1,0 +1,750 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.kriging_ops &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyprecag.kriging_ops</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyprecag.kriging_ops</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">from</span> <span class="nn">rasterio</span> <span class="k">import</span> <span class="n">features</span>
+
+<span class="kn">from</span> <span class="nn">unidecode</span> <span class="k">import</span> <span class="n">unidecode</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">.convert</span> <span class="k">import</span> <span class="n">add_point_geometry_to_dataframe</span><span class="p">,</span> <span class="n">numeric_pixelsize_to_string</span>
+<span class="kn">from</span> <span class="nn">.describe</span> <span class="k">import</span> <span class="n">predictCoordinateColumnNames</span>
+<span class="kn">from</span> <span class="nn">.raster_ops</span> <span class="k">import</span> <span class="n">raster_snap_extent</span><span class="p">,</span> <span class="n">create_raster_transform</span>
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">LOGGER</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+<span class="c1"># DEBUG = config.get_debug_mode()  # LOGGER.isEnabledFor(logging.DEBUG)</span>
+
+<span class="c1"># Set default value for vesper_exe</span>
+<span class="n">vesper_exe</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;C:\Program Files (x86)\Vesper\Vesper1.6.exe&quot;</span>
+
+
+<div class="viewcode-block" id="test_for_windows"><a class="viewcode-back" href="../../reference/pyprecag.kriging_ops.html#pyprecag.kriging_ops.test_for_windows">[docs]</a><span class="k">def</span> <span class="nf">test_for_windows</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;Windows&#39;</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">vesper_exe</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Kriging currently only available on Windows with Vesper installed&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># consider enums - https://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python</span>
+<span class="c1"># The codes for the variogram. The key is the tag used in the control file_csv</span>
+<span class="n">VESPER_OPTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;jigraph&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Don&#39;t Show&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Show&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                  <span class="s2">&quot;jimap&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Don&#39;t Show&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Show&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                  <span class="s2">&quot;jlockrg&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Local&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Global&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                  <span class="s2">&quot;jpntkrg&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Block&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Point&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Punctual&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                  <span class="s2">&quot;jsetrad&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Calculate Radius&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Set Radius&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                  <span class="s2">&quot;jcomvar&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Define Variogram Parameter&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Compute Variogram&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                  <span class="s2">&quot;modtyp&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Spherical&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Exponential&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Gaussian&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                             <span class="s2">&quot;Linear with sill&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;Stable&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;Generalised Cauchy&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+                             <span class="s2">&quot;Matern&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;Double spherical&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;Double exponential&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">},</span>
+                  <span class="s2">&quot;iwei&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;unity&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;No. of pairs&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;1/variance&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;no_pairs/variance&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                           <span class="s2">&quot;no_pairs/fitted&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}}</span>
+
+
+<div class="viewcode-block" id="VesperControl"><a class="viewcode-back" href="../../reference/pyprecag.kriging_ops.html#pyprecag.kriging_ops.VesperControl">[docs]</a><span class="k">class</span> <span class="nc">VesperControl</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">MutableMapping</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A dictionary used to manage vesper control keys and values.</span>
+
+<span class="sd">    The list of keys is confined to those in __defaults, values are checked against the default</span>
+<span class="sd">    and must be the same type.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        __defaults = values to use as defaults. Defaults are set for type as well ie 0.00 = float</span>
+<span class="sd">        key_order = This doubles as the list of allowed keys and the order required when writing</span>
+<span class="sd">               to file with the exception of epsg.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__defaults</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ivers</span><span class="o">=</span><span class="mi">16121</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;kriging of control.txt configured by pyprecag epsg=&#39;</span><span class="p">,</span>
+                      <span class="n">datfil</span><span class="o">=</span><span class="s1">&#39;vesperdata.csv&#39;</span><span class="p">,</span> <span class="n">gridfile</span><span class="o">=</span><span class="s1">&#39;vespergrid.txt&#39;</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                      <span class="n">repfil</span><span class="o">=</span><span class="s1">&#39;report.txt&#39;</span><span class="p">,</span> <span class="n">outfil</span><span class="o">=</span><span class="s1">&#39;kriged.txt&#39;</span><span class="p">,</span> <span class="n">parfil</span><span class="o">=</span><span class="s1">&#39;parameter.txt&#39;</span><span class="p">,</span> <span class="n">numcol</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                      <span class="n">icol_x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">icol_y</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">icol_z</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">jordkrg</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">jpntkrg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">jlockrg</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nest</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                      <span class="n">dstinc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">valmis</span><span class="o">=-</span><span class="mi">9999</span><span class="p">,</span> <span class="n">jsetint</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xlint</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xhint</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ylint</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">yhint</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                      <span class="n">jsetrad</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">minpts</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">maxpts</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">sigsqr</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">isomod</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">modtyp</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                      <span class="n">isearch</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">igeos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">icircs</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">psin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">pcos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">jcomvar</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nlag</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                      <span class="n">hmax</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tolag</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">iwei</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">jigraph</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">jimap</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                      <span class="n">CO</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">C1</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">A1</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">C2</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">A2</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Alfa</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                      <span class="n">xside</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">yside</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">lognorm</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">itrend</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">iconvex</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">igrids</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># key_order is the order the tags will be written to file. epsg is excluded and written first</span>
+    <span class="n">key_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ivers&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;datfil&#39;</span><span class="p">,</span> <span class="s1">&#39;outdir&#39;</span><span class="p">,</span> <span class="s1">&#39;repfil&#39;</span><span class="p">,</span> <span class="s1">&#39;outfil&#39;</span><span class="p">,</span> <span class="s1">&#39;parfil&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;igrids&#39;</span><span class="p">,</span> <span class="s1">&#39;gridfile&#39;</span><span class="p">,</span> <span class="s1">&#39;jigraph&#39;</span><span class="p">,</span> <span class="s1">&#39;jimap&#39;</span><span class="p">,</span> <span class="s1">&#39;numcol&#39;</span><span class="p">,</span> <span class="s1">&#39;icol_x&#39;</span><span class="p">,</span> <span class="s1">&#39;icol_y&#39;</span><span class="p">,</span> <span class="s1">&#39;icol_z&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;valmis&#39;</span><span class="p">,</span> <span class="s1">&#39;jpntkrg&#39;</span><span class="p">,</span> <span class="s1">&#39;xside&#39;</span><span class="p">,</span> <span class="s1">&#39;yside&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;nest&#39;</span><span class="p">,</span> <span class="s1">&#39;dstinc&#39;</span><span class="p">,</span> <span class="s1">&#39;jsetint&#39;</span><span class="p">,</span> <span class="s1">&#39;xlint&#39;</span><span class="p">,</span> <span class="s1">&#39;xhint&#39;</span><span class="p">,</span> <span class="s1">&#39;ylint&#39;</span><span class="p">,</span> <span class="s1">&#39;yhint&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;jsetrad&#39;</span><span class="p">,</span> <span class="s1">&#39;radius&#39;</span><span class="p">,</span> <span class="s1">&#39;minpts&#39;</span><span class="p">,</span> <span class="s1">&#39;maxpts&#39;</span><span class="p">,</span> <span class="s1">&#39;sigsqr&#39;</span><span class="p">,</span> <span class="s1">&#39;lognorm&#39;</span><span class="p">,</span> <span class="s1">&#39;itrend&#39;</span><span class="p">,</span> <span class="s1">&#39;iconvex&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;jlockrg&#39;</span><span class="p">,</span> <span class="s1">&#39;jcomvar&#39;</span><span class="p">,</span> <span class="s1">&#39;nlag&#39;</span><span class="p">,</span> <span class="s1">&#39;tolag&#39;</span><span class="p">,</span> <span class="s1">&#39;hmax&#39;</span><span class="p">,</span> <span class="s1">&#39;iwei&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;modtyp&#39;</span><span class="p">,</span> <span class="s1">&#39;CO&#39;</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">,</span> <span class="s1">&#39;A2&#39;</span><span class="p">,</span> <span class="s1">&#39;Alfa&#39;</span><span class="p">,</span> <span class="s1">&#39;jordkrg&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;isomod&#39;</span><span class="p">,</span> <span class="s1">&#39;isearch&#39;</span><span class="p">,</span> <span class="s1">&#39;igeos&#39;</span><span class="p">,</span> <span class="s1">&#39;icircs&#39;</span><span class="p">,</span> <span class="s1">&#39;phi&#39;</span><span class="p">,</span> <span class="s1">&#39;psin&#39;</span><span class="p">,</span> <span class="s1">&#39;pcos&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="VesperControl.__init__"><a class="viewcode-back" href="../../reference/pyprecag.kriging_ops.html#pyprecag.kriging_ops.VesperControl.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">__defaults</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; check if key is from a predefined list and the value of the correct type</span>
+
+<span class="sd">        epsg is an non-vesper key so it is excluded from the keyorder and written at top of file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_order</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;epsg&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;VesperControl has no attribute </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">VESPER_OPTIONS</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">VESPER_OPTIONS</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">value</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> is an invalid option for </span><span class="si">{}</span><span class="s1">. Options are </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">value</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">VESPER_OPTIONS</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">long</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">VESPER_OPTIONS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> is an invalid option for </span><span class="si">{}</span><span class="s1">. Options are </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">value</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">VESPER_OPTIONS</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__defaults</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;value for key </span><span class="si">{}</span><span class="s1"> should be a float or int - Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">key</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)))</span>
+
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__defaults</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;value for key </span><span class="si">{}</span><span class="s1"> should be a </span><span class="si">{}</span><span class="s1"> - Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">key</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__defaults</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
+        <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__defaults</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VesperControl.updated_keys"><a class="viewcode-back" href="../../reference/pyprecag.kriging_ops.html#pyprecag.kriging_ops.VesperControl.updated_keys">[docs]</a>    <span class="k">def</span> <span class="nf">updated_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">updated_keys</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__defaults</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">updated_keys</span></div>
+
+<div class="viewcode-block" id="VesperControl.write_to_file"><a class="viewcode-back" href="../../reference/pyprecag.kriging_ops.html#pyprecag.kriging_ops.VesperControl.write_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">output_file</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Output file not specified&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">output_file</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Output folder </span><span class="si">{}</span><span class="s1"> does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">output_file</span><span class="p">)))</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">w_out</span><span class="p">:</span>
+            <span class="c1"># add epsg tag outside the standard vesper file denoted by $vsl and $end</span>
+            <span class="n">w_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;epsg=</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;epsg&#39;</span><span class="p">]))</span>
+            <span class="n">w_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;$vsl</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_order</span><span class="p">:</span>
+                <span class="c1"># need to quote the strings</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;datfil&#39;</span><span class="p">,</span> <span class="s1">&#39;gridfile&#39;</span><span class="p">,</span> <span class="s1">&#39;outdir&#39;</span><span class="p">,</span> <span class="s1">&#39;repfil&#39;</span><span class="p">,</span> <span class="s1">&#39;outfil&#39;</span><span class="p">,</span> <span class="s1">&#39;parfil&#39;</span><span class="p">]:</span>
+                    <span class="n">w_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">=&#39;</span><span class="si">{}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">w_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">=</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+            <span class="n">w_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;$end</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="vesper_text_to_raster"><a class="viewcode-back" href="../../reference/pyprecag.kriging_ops.html#pyprecag.kriging_ops.vesper_text_to_raster">[docs]</a><span class="k">def</span> <span class="nf">vesper_text_to_raster</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">,</span> <span class="n">krig_epsg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=-</span><span class="mi">9999</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert an vesper kriged text file output to a prediction and a standard error (SE) tif</span>
+<span class="sd">    raster, and create a confidence interval (CI) metadata file. If the output files already</span>
+<span class="sd">    exists, they will be overwritten.</span>
+
+<span class="sd">    Kriging using Vesper creates 3 new files:</span>
+<span class="sd">        *_kriged_*.txt, *_report_*.txt, *_parameter_*.txt.</span>
+
+<span class="sd">      There is a 100 character file path limitation set within vesper for the kriged and</span>
+<span class="sd">      report files. By using the control filename as the input, the truncated files can be renamed</span>
+<span class="sd">      to their correct names and is used as a base for derived tiff and metadata</span>
+
+<span class="sd">    The *_kriged_*.txt file contains the data to create the desired outputs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        control_textfile (str): The control file for the associated vesper krige raster</span>
+<span class="sd">                               (see note above) to convert.</span>
+<span class="sd">        krig_epsg (int): The EPSG number to assign to the output raster</span>
+<span class="sd">        nodata_value (int): The value to assign to nodata pixels.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        *_CI_*.txt      The confidence interval (CI) metadata file.</span>
+<span class="sd">        *_PRED_*.tif    The kriged column prediction tif</span>
+<span class="sd">        *_SE_*.tif      The kriged column standard error (SE) tif</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Invalid path: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">argCheck</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;krig_epsg&#39;</span><span class="p">,</span> <span class="n">krig_epsg</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;nodata_value&#39;</span><span class="p">,</span> <span class="n">nodata_value</span><span class="p">)]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> must be a integer.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># There is a 100 character file path limitation set for the kriged and report outputs from</span>
+    <span class="c1">#  vesper. By using the control filename we can find these truncated files and correct names.</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="n">search_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">)</span>
+        <span class="n">search_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">[:</span><span class="mi">101</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="n">control_textfile</span><span class="p">[</span><span class="mi">101</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">ea_file</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">search_dir</span><span class="p">,</span> <span class="n">search_file</span><span class="p">)):</span>
+            <span class="c1"># only rename if there is no extension on the file</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">ea_file</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">ea_file</span><span class="p">,</span> <span class="n">ea_file</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Renaming file </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ea_file</span><span class="p">,</span> <span class="n">ea_file</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">))</span>
+
+    <span class="n">krige_textfile</span> <span class="o">=</span> <span class="n">control_textfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="s1">&#39;kriged&#39;</span><span class="p">)</span>
+    <span class="n">out_ci_txt</span> <span class="o">=</span> <span class="n">control_textfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="s1">&#39;CI&#39;</span><span class="p">)</span>
+
+    <span class="n">df_krige</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">krige_textfile</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">median_val</span> <span class="o">=</span> <span class="n">df_krige</span><span class="p">[</span><span class="s1">&#39;SE_Pred&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">median</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_ci_txt</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ci_file</span><span class="p">:</span>
+        <span class="n">ci_file</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="s2">&quot;Median Prediction SE    : </span><span class="si">{:.5f}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">median_val</span><span class="p">))</span>
+        <span class="n">ci_file</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="s2">&quot;95% Confidence Interval : </span><span class="si">{:.5f}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mf">1.96</span> <span class="o">*</span> <span class="n">median_val</span><span class="p">))</span>
+        <span class="n">ci_file</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span>
+            <span class="s2">&quot;Date/time : &quot;</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%b-%Y %H:%M&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">userhome</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">)</span>
+        <span class="n">ci_file</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="s2">&quot;Username  : &quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">userhome</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CI File contents : </span><span class="se">\n\t</span><span class="s2">Median Prediction SE    : </span><span class="si">{:.5f}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                 <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">95% Confidence Interval : </span><span class="si">{:.5f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">median_val</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="mf">1.96</span> <span class="o">*</span> <span class="n">median_val</span><span class="p">))</span>
+
+    <span class="n">x_field</span><span class="p">,</span> <span class="n">y_field</span> <span class="o">=</span> <span class="n">predictCoordinateColumnNames</span><span class="p">(</span><span class="n">df_krige</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+    <span class="n">gdf_krig</span><span class="p">,</span> <span class="n">gdf_crs</span> <span class="o">=</span> <span class="n">add_point_geometry_to_dataframe</span><span class="p">(</span><span class="n">df_krige</span><span class="p">,</span> <span class="p">[</span><span class="n">x_field</span><span class="p">,</span> <span class="n">y_field</span><span class="p">],</span> <span class="n">krig_epsg</span><span class="p">)</span>
+
+    <span class="n">cellsize_x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">df_krige</span><span class="p">[</span><span class="n">x_field</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mode</span><span class="p">())</span>
+    <span class="n">cellsize_y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">df_krige</span><span class="p">[</span><span class="n">y_field</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mode</span><span class="p">())</span>
+    <span class="n">pixel_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cellsize_x</span><span class="p">,</span> <span class="n">cellsize_y</span><span class="p">)</span>
+
+    <span class="n">pixel_size_str</span> <span class="o">=</span> <span class="n">numeric_pixelsize_to_string</span><span class="p">(</span><span class="n">pixel_size</span><span class="p">)</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Cellsize: </span><span class="si">{}</span><span class="s2">  X: </span><span class="si">{}</span><span class="s2">  Y: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pixel_size</span><span class="p">,</span> <span class="n">cellsize_x</span><span class="p">,</span> <span class="n">cellsize_y</span><span class="p">))</span>
+    <span class="n">out_se_tif</span> <span class="o">=</span> <span class="n">control_textfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="s1">&#39;SE_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pixel_size_str</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.txt&#39;</span><span class="p">,</span>
+                                                                                             <span class="s1">&#39;.tif&#39;</span><span class="p">)</span>
+    <span class="n">out_pred_tif</span> <span class="o">=</span> <span class="n">control_textfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="s1">&#39;PRED_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pixel_size_str</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+        <span class="s1">&#39;.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;.tif&#39;</span><span class="p">)</span>
+
+    <span class="c1"># create an affine transformation matrix to associate the array to the coordinates.</span>
+    <span class="n">transform</span><span class="p">,</span> <span class="n">x_cols</span><span class="p">,</span> <span class="n">y_rows</span><span class="p">,</span> <span class="n">new_bbox</span> <span class="o">=</span> <span class="n">create_raster_transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">gdf_krig</span><span class="o">.</span><span class="n">total_bounds</span><span class="p">),</span>
+                                                                  <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixel_size</span><span class="p">)</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Width (xCols):     </span><span class="si">{}</span><span class="s1">   Height (yRows):     </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_cols</span><span class="p">,</span> <span class="n">y_rows</span><span class="p">))</span>
+
+    <span class="c1"># create the two tifs and populate with data. This method is by far the quickest of all</span>
+    <span class="c1"># 3 methods trialed.</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">out_pred_tif</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s1">&#39;GTiff&#39;</span><span class="p">,</span>
+                       <span class="n">width</span><span class="o">=</span><span class="n">x_cols</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">y_rows</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                       <span class="n">crs</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">CRS</span><span class="o">.</span><span class="n">from_epsg</span><span class="p">(</span><span class="n">krig_epsg</span><span class="p">),</span>
+                       <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=-</span><span class="mi">9999</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_pred</span><span class="p">:</span>
+
+        <span class="c1"># uses points to burn values into the corresponding raster pixel.</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="p">((</span><span class="n">geom</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">geom</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">gdf_krig</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">],</span> <span class="n">gdf_krig</span><span class="p">[</span><span class="s1">&#39;Predicted&#39;</span><span class="p">]))</span>
+        <span class="n">burned</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">rasterize</span><span class="p">(</span><span class="n">shapes</span><span class="o">=</span><span class="n">shapes</span><span class="p">,</span> <span class="n">out_shape</span><span class="o">=</span><span class="p">(</span><span class="n">y_rows</span><span class="p">,</span> <span class="n">x_cols</span><span class="p">),</span>
+                                    <span class="n">transform</span><span class="o">=</span><span class="n">out_pred</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">nodata_value</span><span class="p">)</span>
+
+        <span class="n">out_pred</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">burned</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">out_se_tif</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s1">&#39;GTiff&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">x_cols</span><span class="p">,</span>
+                       <span class="n">height</span><span class="o">=</span><span class="n">y_rows</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                       <span class="n">crs</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">CRS</span><span class="o">.</span><span class="n">from_epsg</span><span class="p">(</span><span class="n">krig_epsg</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=-</span><span class="mi">9999</span><span class="p">,</span>
+                       <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_se</span><span class="p">:</span>
+
+        <span class="c1"># uses points to burn values into the corresponding raster pixel.</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="p">((</span><span class="n">geom</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">geom</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">gdf_krig</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">],</span> <span class="n">gdf_krig</span><span class="p">[</span><span class="s1">&#39;SE_Pred&#39;</span><span class="p">]))</span>
+        <span class="n">burned</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">rasterize</span><span class="p">(</span><span class="n">shapes</span><span class="o">=</span><span class="n">shapes</span><span class="p">,</span> <span class="n">out_shape</span><span class="o">=</span><span class="p">(</span><span class="n">y_rows</span><span class="p">,</span> <span class="n">x_cols</span><span class="p">),</span>
+                                    <span class="n">transform</span><span class="o">=</span><span class="n">out_se</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">nodata_value</span><span class="p">)</span>
+        <span class="n">out_se</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">burned</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="se">\t</span><span class="si">{dur:&lt;15}</span><span class="se">\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                                               <span class="n">dur</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span>
+                                                   <span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">out_pred_tif</span><span class="p">,</span> <span class="n">out_se_tif</span><span class="p">,</span> <span class="n">out_ci_txt</span></div>
+
+
+<div class="viewcode-block" id="prepare_for_vesper_krige"><a class="viewcode-back" href="../../reference/pyprecag.kriging_ops.html#pyprecag.kriging_ops.prepare_for_vesper_krige">[docs]</a><span class="k">def</span> <span class="nf">prepare_for_vesper_krige</span><span class="p">(</span><span class="n">in_dataframe</span><span class="p">,</span> <span class="n">krig_column</span><span class="p">,</span> <span class="n">grid_filename</span><span class="p">,</span> <span class="n">out_folder</span><span class="p">,</span>
+                             <span class="n">control_textfile</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">coord_columns</span><span class="o">=</span><span class="p">[],</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">display_graphics</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="n">control_options</span><span class="o">=</span><span class="n">VesperControl</span><span class="p">(),</span>
+                             <span class="n">block_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                             <span class="n">vesper_exe</span><span class="o">=</span><span class="n">vesper_exe</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Prepare data for vesper kriging and create a windows batch file to run outside the</span>
+<span class="sd">    python/pyprecag environment.</span>
+
+<span class="sd">    The input arguments will be used to update the control_options.</span>
+
+<span class="sd">    A description of the keys and their options can be found in the VESPER user manual at</span>
+<span class="sd">    https://sydney.edu.au/agriculture/pal/documents/Vesper_1.6_User_Manual.pdf</span>
+
+<span class="sd">    block_size will be replaced by the xside and yside keys in the VesperControl Object.</span>
+
+<span class="sd">    Outputs:  The following files will be added to the vesper sub-folder in the output folder.</span>
+<span class="sd">        *_control_*.txt  - The vesper control file</span>
+<span class="sd">        *_vesperdata_*.csv - The subset of data to krige. All non-required columns are deleted.</span>
+<span class="sd">        Do_Vesper.bat - A windows batch file to launch vesper kriging for all control files</span>
+
+<span class="sd">        Any files matching the derived kriged output names will be deleted to ensure that the</span>
+<span class="sd">        files in the folder belong to the newly create control file. If old version are to</span>
+<span class="sd">        be kept, manually rename first.</span>
+
+<span class="sd">    DEPENDANCY: Vesper must already be installed on the PC and the install directory added</span>
+<span class="sd">    to the config.json file.</span>
+
+<span class="sd">    Args:</span>
+
+<span class="sd">        in_dataframe (geopandas.geodataframe.GeoDataFrame, pandas.core.frame.DataFrame):</span>
+<span class="sd">        krig_column (str): The column containing the data to krige.</span>
+<span class="sd">        grid_filename (str): The vesper grid file.</span>
+<span class="sd">        control_textfile (str): The name of the control text file without the path</span>
+<span class="sd">        out_folder (str): The folder to add outputs too. A &#39;Vesper&#39; sub directory will be created</span>
+<span class="sd">        block_size (int): The size to apply for block Kriging. Units are from the coordinate system.</span>
+<span class="sd">        coord_columns (List): The columns representing the X and Y coordinates.</span>
+<span class="sd">        epsg (int) : The epsg_number number for the data. If 0 the en_epsg or</span>
+<span class="sd">                     enepsg column (if exists) will be used.</span>
+<span class="sd">        display_graphics (bool): Option to display graphics while running vesper kriging.</span>
+<span class="sd">        vesper_exe (str): The path for the location of the Vesper executable</span>
+<span class="sd">        control_options (pyprecag.kriging_ops.VesperControl): Vesper control settings parameters</span>
+<span class="sd">    Returns:</span>
+<span class="sd">       vesper_batfile, vesper_ctrlfile: The paths to the generated batch file and control file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Vesper only works with Windows</span>
+    <span class="c1"># test_for_windows()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_dataframe</span><span class="p">,</span> <span class="p">(</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid input data :in_dataframe&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">grid_filename</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Invalid path: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">grid_filename</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">block_size</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;block_size must be an integer&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">block_size</span><span class="p">))</span>
+
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;block_size is deprecated, use VesperControl xsize and ysize instead&#39;</span><span class="p">,</span>
+                  <span class="ne">PendingDeprecationWarning</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">out_folder</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Please specify an output folder&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">out_folder</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Output directory </span><span class="si">{}</span><span class="s1"> does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">out_folder</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coord_columns</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Coordinate columns should be a list.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">coord_columns</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coord_columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">coord_columns</span> <span class="o">=</span> <span class="n">predictCoordinateColumnNames</span><span class="p">(</span><span class="n">in_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">eaFld</span> <span class="ow">in</span> <span class="p">[</span><span class="n">krig_column</span><span class="p">]</span> <span class="o">+</span> <span class="n">coord_columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">eaFld</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">in_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Column </span><span class="si">{}</span><span class="s1"> does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eaFld</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">epsg</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;EPSG </span><span class="si">{}</span><span class="s1"> must be a integer.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epsg</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control_options</span><span class="p">,</span> <span class="n">VesperControl</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;control_options must of type VesperControl&#39;</span><span class="p">)</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Create a filename compatible copy of the krig_column</span>
+    <span class="n">krig_col_file</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;[^A-Za-z0-9_-]+&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">unidecode</span><span class="p">(</span><span class="n">unicode</span><span class="p">(</span><span class="n">krig_column</span><span class="p">)))</span>
+
+    <span class="n">out_sub_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">grid_filename</span><span class="p">)[:</span><span class="mi">20</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">control_textfile</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]:</span>
+        <span class="n">control_textfile</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_control_</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_sub_name</span><span class="p">,</span> <span class="n">krig_col_file</span><span class="p">)</span>
+        <span class="n">data_file</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_vesperdata_</span><span class="si">{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_sub_name</span><span class="p">,</span> <span class="n">krig_col_file</span><span class="p">)</span>
+        <span class="n">grid_file</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_vespergrid_</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_sub_name</span><span class="p">,</span> <span class="n">krig_col_file</span><span class="p">)</span>
+        <span class="n">report_file</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_report_</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_sub_name</span><span class="p">,</span> <span class="n">krig_col_file</span><span class="p">)</span>
+        <span class="n">kriged_file</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_kriged_</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_sub_name</span><span class="p">,</span> <span class="n">krig_col_file</span><span class="p">)</span>
+        <span class="n">param_file</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_parameter_</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_sub_name</span><span class="p">,</span> <span class="n">krig_col_file</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="s1">&#39;control&#39;</span> <span class="ow">in</span> <span class="n">control_textfile</span><span class="p">:</span>
+        <span class="n">data_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="s1">&#39;vesperdata&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span>
+        <span class="n">grid_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="s1">&#39;vespergrid&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.txt&#39;</span>
+        <span class="n">report_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="s1">&#39;report&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.txt&#39;</span>
+        <span class="n">kriged_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="s1">&#39;kriged&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.txt&#39;</span>
+        <span class="n">param_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="s1">&#39;parameter&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.txt&#39;</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_vesperdata.csv&#39;</span>
+        <span class="n">report_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_report.txt&#39;</span>
+        <span class="n">kriged_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_kriged.txt&#39;</span>
+        <span class="n">param_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_parameter.txt&#39;</span>
+        <span class="n">grid_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_vespergrid.txt&#39;</span>
+
+    <span class="n">vesper_outdir</span> <span class="o">=</span> <span class="n">out_folder</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">out_folder</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Vesper&#39;</span><span class="p">:</span>
+        <span class="n">vesper_outdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_folder</span><span class="p">,</span> <span class="s1">&#39;Vesper&#39;</span><span class="p">)</span>
+
+    <span class="n">vesper_ctrlfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vesper_outdir</span><span class="p">,</span> <span class="n">control_textfile</span><span class="p">)</span>
+    <span class="n">vesper_datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vesper_outdir</span><span class="p">,</span> <span class="n">data_file</span><span class="p">)</span>
+    <span class="n">vesper_gridfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vesper_outdir</span><span class="p">,</span> <span class="n">grid_file</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">vesper_outdir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">vesper_outdir</span><span class="p">)</span>
+
+    <span class="c1"># check Permission Denied or WindowsError: [Error 32]) errors which may indicate that the files</span>
+    <span class="c1"># in use either by vesper or another app.</span>
+
+    <span class="c1"># Start always start with the control file. this is what gets used within QGIS</span>
+    <span class="n">files_list</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vesper_outdir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_*_</span><span class="si">{}</span><span class="s2">.*&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_sub_name</span><span class="p">,</span> <span class="n">krig_col_file</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">vesper_ctrlfile</span> <span class="ow">in</span> <span class="n">files_list</span><span class="p">:</span>
+        <span class="n">files_list</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">files_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">files_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">vesper_ctrlfile</span><span class="p">)))</span>
+
+    <span class="k">for</span> <span class="n">eaFile</span> <span class="ow">in</span> <span class="n">files_list</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">eaFile</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;File(s) in use - </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eaFile</span><span class="p">))</span>
+
+    <span class="c1"># if control file already exists then replace it, and delete all matching kriging</span>
+    <span class="c1"># outputs and tiff files.</span>
+    <span class="k">for</span> <span class="n">eaFile</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vesper_outdir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_*_</span><span class="si">{}</span><span class="s2">.*&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_sub_name</span><span class="p">,</span> <span class="n">krig_col_file</span><span class="p">))):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">eaFile</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Deleted file </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eaFile</span><span class="p">))</span>
+
+    <span class="n">x_field</span><span class="p">,</span> <span class="n">y_field</span> <span class="o">=</span> <span class="n">coord_columns</span>
+
+    <span class="n">keep_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">findCol</span> <span class="k">for</span> <span class="n">findCol</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;EN_EPSG&#39;</span><span class="p">,</span> <span class="s1">&#39;ENEPSG&#39;</span><span class="p">,</span> <span class="s1">&#39;EPSG&#39;</span><span class="p">]</span>
+                 <span class="k">if</span> <span class="n">findCol</span> <span class="ow">in</span> <span class="n">in_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">epsg</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">keep_cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">keep_cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">in_dataframe</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">epsg</span> <span class="o">=</span> <span class="n">in_dataframe</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">col</span><span class="p">]</span>
+                <span class="k">break</span>
+
+    <span class="n">keep_cols</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x_field</span><span class="p">,</span> <span class="n">y_field</span><span class="p">,</span> <span class="n">krig_column</span><span class="p">]</span>
+
+    <span class="n">df_csv</span> <span class="o">=</span> <span class="n">in_dataframe</span><span class="p">[</span><span class="n">keep_cols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df_csv</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">vesper_datafile</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">grid_filename</span><span class="p">,</span> <span class="n">vesper_gridfile</span><span class="p">)</span>
+
+    <span class="n">x_field</span><span class="p">,</span> <span class="n">y_field</span> <span class="o">=</span> <span class="n">coord_columns</span>
+    <span class="n">i_x_column</span> <span class="o">=</span> <span class="n">df_csv</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x_field</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">i_y_column</span> <span class="o">=</span> <span class="n">df_csv</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">y_field</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">i_k_column</span> <span class="o">=</span> <span class="n">df_csv</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">krig_column</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># update the control_options for the new csv file</span>
+    <span class="n">control_options</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">,</span>
+                           <span class="n">title</span><span class="o">=</span><span class="s2">&quot;kriging of </span><span class="si">{}</span><span class="s2"> configured by pyprecag&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">control_textfile</span><span class="p">),</span>
+                           <span class="n">datfil</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data_file</span><span class="p">),</span>
+                           <span class="n">gridfile</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">grid_file</span><span class="p">),</span>
+                           <span class="n">outdir</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># blank writes to control file_csv folder</span>
+                           <span class="n">repfil</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">report_file</span><span class="p">),</span>
+                           <span class="n">outfil</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kriged_file</span><span class="p">),</span>
+                           <span class="n">parfil</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param_file</span><span class="p">),</span>
+                           <span class="n">numcol</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df_csv</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span>
+                           <span class="n">icol_x</span><span class="o">=</span><span class="n">i_x_column</span><span class="p">,</span>
+                           <span class="n">icol_y</span><span class="o">=</span><span class="n">i_y_column</span><span class="p">,</span>
+                           <span class="n">icol_z</span><span class="o">=</span><span class="n">i_k_column</span><span class="p">,</span>
+                           <span class="n">jigraph</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">display_graphics</span><span class="p">),</span>  <span class="c1"># 1, show graph, otherwise 0</span>
+                           <span class="n">jimap</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">display_graphics</span><span class="p">),</span>  <span class="c1"># 1, show map, otherwise 0)</span>
+                           <span class="p">)</span>
+
+    <span class="c1"># high density kriging. fix for pre VesperControl Class</span>
+    <span class="k">if</span> <span class="n">block_size</span> <span class="o">!=</span> <span class="mi">10</span><span class="p">:</span>  <span class="c1"># only update if not the default variable value</span>
+        <span class="n">control_options</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;xside&quot;</span><span class="p">:</span> <span class="n">block_size</span><span class="p">,</span>
+                                <span class="s2">&quot;yside&quot;</span><span class="p">:</span> <span class="n">block_size</span><span class="p">})</span>
+
+    <span class="c1"># ---------------------------------------------------------------------------------------------</span>
+    <span class="c1"># Write a VESPER control file</span>
+    <span class="n">control_options</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="n">vesper_ctrlfile</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">vesper_exe</span><span class="p">):</span>
+        <span class="n">vesper_batfile</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Vesper*.exe at &quot;</span><span class="si">{exe}</span><span class="s1">&quot; does not exist. &#39;</span>
+                      <span class="s1">&#39;Batch file not created&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">exe</span><span class="o">=</span><span class="n">vesper_exe</span><span class="p">))</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vesper_batfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vesper_outdir</span><span class="p">,</span> <span class="s2">&quot;Do_Vesper.bat&quot;</span><span class="p">)</span>
+
+        <span class="n">bat_file_string</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;@echo off</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="c1"># &quot;REM enable delayed variable expansion, t\n&quot;</span>
+                           <span class="s2">&quot;setlocal enabledelayedexpansion</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s2">&quot;echo Processing control files in %CD%</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s2">&quot;echo.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s2">&quot;set icount=0</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s2">&quot;set tcount=0</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">REM count the number of control files</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s2">&quot;for </span><span class="si">%%</span><span class="s2">x in (*control*.txt) do set /a tcount+=1&#39;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s2">&quot;echo Found %tcount</span><span class="si">% c</span><span class="s2">ontrol file_csv(s) to process....</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s2">&quot;echo.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="c1"># suppress newline char and enable &#39;FINISHED&#39; to be added</span>
+                           <span class="c1"># setlocal enabledelayedexpansion and ! instead of % will</span>
+                           <span class="c1"># evaluate a variable when they appear instead of when the</span>
+                           <span class="c1"># batch is parsed</span>
+                           <span class="s2">&quot;FOR </span><span class="si">%%</span><span class="s2">f IN (*control*) DO (</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s2">&quot;   set /a icount+=</span><span class="si">%i</span><span class="s2">count%+1</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s2">&quot;    &lt;nul set /p mystr=Kriging !icount! of %tcount</span><span class="si">% - %</span><span class="s2">%~nxf </span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s1">&#39;   start &quot;&quot; /HIGH /WAIT /SHARED </span><span class="se">\&quot;</span><span class="si">{exe}</span><span class="se">\&quot;</span><span class="s1"> </span><span class="si">%%</span><span class="s1">~nxf</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="s2">&quot;   echo - Finished </span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s2">&quot;)</span><span class="se">\n</span><span class="s2">&quot;</span>  <span class="c1"># close bracket for for /f do loop</span>
+                           <span class="c1"># &quot;echo.\n&quot;</span>
+                           <span class="c1"># &quot;pause\n&quot;</span>
+                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">exe</span><span class="o">=</span><span class="n">vesper_exe</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">vesper_batfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wBatFile</span><span class="p">:</span>
+            <span class="n">wBatFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">bat_file_string</span><span class="p">)</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="se">\t</span><span class="si">{dur:&lt;15}</span><span class="se">\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                                               <span class="n">dur</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span>
+                                                   <span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">vesper_batfile</span><span class="p">,</span> <span class="n">vesper_ctrlfile</span></div>
+
+
+<div class="viewcode-block" id="run_vesper"><a class="viewcode-back" href="../../reference/pyprecag.kriging_ops.html#pyprecag.kriging_ops.run_vesper">[docs]</a><span class="k">def</span> <span class="nf">run_vesper</span><span class="p">(</span><span class="n">ctrl_file</span><span class="p">,</span> <span class="n">bMinimiseWindow</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vesper_exe</span><span class="o">=</span><span class="n">vesper_exe</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run VESPER for selected control file.</span>
+
+<span class="sd">    By default the current working directory will be set to the folder containing the control file.</span>
+
+<span class="sd">    By default processing will wait for the current VESPER control file to complete.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        ctrl_file (str):  the control file to run as VESPER argument.</span>
+<span class="sd">        bMinimiseWindow (bool):  Option to automatically minimise the VESPER window on launch.</span>
+<span class="sd">        vesper_exe (str): The path for the location of the Vesper executable</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Vesper only works with Windows</span>
+    <span class="n">test_for_windows</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">vesper_exe</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Vesper*.exe at &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vesper_exe</span><span class="p">)</span>
+                      <span class="o">+</span> <span class="s1">&#39; does not exist. Please install and configure for kriging to occur&#39;</span><span class="p">)</span>
+
+    <span class="n">task_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="n">info</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">STARTUPINFO</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">bMinimiseWindow</span><span class="p">:</span>
+        <span class="c1"># run vesper minimised.</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">dwFlags</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">STARTF_USESHOWWINDOW</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">wShowWindow</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># SW_MINIMIZE</span>
+
+    <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">vesper_exe</span><span class="p">,</span> <span class="n">ctrl_file</span><span class="p">],</span> <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">ctrl_file</span><span class="p">),</span>
+                               <span class="n">startupinfo</span><span class="o">=</span><span class="n">info</span><span class="p">)</span>
+    <span class="n">process</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="se">\t</span><span class="si">{dur:&lt;15}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Vesper Kriging&#39;</span><span class="p">,</span> <span class="n">dur</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span>
+        <span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">task_time</span><span class="p">)))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

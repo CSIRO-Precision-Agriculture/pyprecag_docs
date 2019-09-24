@@ -1,0 +1,551 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.vector_ops &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyprecag.vector_ops</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyprecag.vector_ops</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="k">import</span> <span class="n">NamedTemporaryFile</span>
+
+<span class="kn">import</span> <span class="nn">fiona</span>
+<span class="kn">import</span> <span class="nn">geopandas</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pyproj</span>
+<span class="kn">import</span> <span class="nn">shapely</span>
+<span class="kn">from</span> <span class="nn">fiona</span> <span class="k">import</span> <span class="n">collection</span> <span class="k">as</span> <span class="n">fionacoll</span>
+<span class="kn">from</span> <span class="nn">fiona.crs</span> <span class="k">import</span> <span class="n">to_string</span>
+<span class="kn">from</span> <span class="nn">osgeo</span> <span class="k">import</span> <span class="n">osr</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">shape</span>
+<span class="kn">from</span> <span class="nn">shapely.ops</span> <span class="k">import</span> <span class="n">unary_union</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">crs</span> <span class="k">as</span> <span class="n">pyprecag_crs</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">TEMPDIR</span><span class="p">,</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">.describe</span> <span class="k">import</span> <span class="n">VectorDescribe</span><span class="p">,</span> <span class="n">save_geopandas_tofile</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="k">import</span> <span class="n">GeometryError</span>
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">LOGGER</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>  <span class="c1"># Handle logging, no logging has been configured</span>
+<span class="c1"># LOGGER.setLevel(logging.DEBUG)</span>
+<span class="c1"># DEBUG = config.get_debug_mode()  # LOGGER.isEnabledFor(logging.DEBUG))</span>
+
+
+<div class="viewcode-block" id="thin_point_by_distance"><a class="viewcode-back" href="../../reference/pyprecag.vector_ops.html#pyprecag.vector_ops.thin_point_by_distance">[docs]</a><span class="k">def</span> <span class="nf">thin_point_by_distance</span><span class="p">(</span><span class="n">point_geodataframe</span><span class="p">,</span> <span class="n">point_crs</span><span class="p">,</span> <span class="n">thin_distance_metres</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">out_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Thin points by a distance in metres. All points less than the set distance will be removed.</span>
+
+<span class="sd">    The point_crs must be a Projected Coordinate System</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        point_geodataframe (geopandas.geodataframe.GeoDataFrame): The input points geodataframe</span>
+<span class="sd">        point_crs (pyprecag_crs.crs): The Projected Spatial Reference System of the point_geodataframe</span>
+<span class="sd">        thin_distance_metres (float):   A floating number representing the minimum distance between points</span>
+<span class="sd">        out_filename (str): (Optional) The path and filename to save the result to</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        geopandas.geodataframe.GeoDataFrame: The thinned geodataframe</span>
+
+<span class="sd">    TODO: Replace with scipy.spatial methods which doesn&#39;t rely on the file being correctly sorted.</span>
+<span class="sd">          In depth testing required.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">argCheck</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;thinDist_m&#39;</span><span class="p">,</span> <span class="n">thin_distance_metres</span><span class="p">)]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> must be a floating number.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point_geodataframe</span><span class="p">,</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input Points should be a geopandas data frame&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;POINT&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">point_geodataframe</span><span class="o">.</span><span class="n">geom_type</span><span class="o">.</span><span class="n">unique</span><span class="p">()))</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">GeometryError</span><span class="p">(</span><span class="s1">&#39;Invalid geometry. input shapefile should be point or multipoint&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point_crs</span><span class="p">,</span> <span class="n">pyprecag_crs</span><span class="o">.</span><span class="n">crs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Crs must be an instance of pyprecag.crs.crs&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">point_crs</span><span class="o">.</span><span class="n">srs</span><span class="o">.</span><span class="n">IsProjected</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input data is not in a projected coordinate system&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">out_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">out_filename</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Output directory </span><span class="si">{}</span><span class="s1"> does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">out_filename</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">out_filename</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">get_debug_mode</span><span class="p">():</span>
+        <span class="c1"># get a unique name, it will create, open the file and delete when done after saving the variable</span>
+        <span class="k">with</span> <span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getframeinfo</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">())[</span><span class="mi">2</span><span class="p">]),</span>
+                                <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;.shp&#39;</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="n">TEMPDIR</span><span class="p">)</span> <span class="k">as</span> <span class="n">new_file</span><span class="p">:</span>
+            <span class="n">out_filename</span> <span class="o">=</span> <span class="n">new_file</span><span class="o">.</span><span class="n">name</span>
+        <span class="c1"># out_filename = &#39;{}.shp&#39;.format(inspect.getframeinfo(inspect.currentframe())[2])</span>
+
+    <span class="c1"># Create a copy</span>
+    <span class="n">point_geodataframe</span> <span class="o">=</span> <span class="n">point_geodataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># create a column and fill with NAN</span>
+    <span class="n">point_geodataframe</span><span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="k">if</span> <span class="n">thin_distance_metres</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;A thin distance of Zero (0) was used. Thinning of input data not undertaken&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">point_geodataframe</span>
+
+    <span class="n">thinDistCSunits</span> <span class="o">=</span> <span class="n">thin_distance_metres</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">point_crs</span><span class="o">.</span><span class="n">srs</span><span class="o">.</span><span class="n">IsProjected</span><span class="p">():</span>
+
+        <span class="c1"># use lower left corner of bnd box to convert metres to dd94 distance.</span>
+        <span class="n">thinDistCSunits</span> <span class="o">=</span> <span class="n">pyprecag_crs</span><span class="o">.</span><span class="n">distance_metres_to_dd</span><span class="p">(</span><span class="n">point_geodataframe</span><span class="o">.</span><span class="n">total_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                             <span class="n">point_geodataframe</span><span class="o">.</span><span class="n">total_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">thin_distance_metres</span><span class="p">)</span>
+
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;\Input data uses a geographics coordinate system.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                       <span class="s1">&#39;Reprojecting parameter thin distance of </span><span class="si">{}</span><span class="s1">m to </span><span class="si">{}</span><span class="s1"> for </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">thin_distance_metres</span><span class="p">,</span>
+                                                                                         <span class="n">thinDistCSunits</span><span class="p">,</span>
+                                                                                         <span class="n">point_geodataframe</span><span class="o">.</span><span class="n">crs</span><span class="p">))</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Filtering by distance </span><span class="si">{}</span><span class="s1">m (</span><span class="si">{}</span><span class="s1"> for </span><span class="si">{}</span><span class="s1">) ------&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">thin_distance_metres</span><span class="p">,</span>
+                                                                             <span class="n">thinDistCSunits</span><span class="p">,</span> <span class="n">point_geodataframe</span><span class="o">.</span><span class="n">crs</span><span class="p">))</span>
+
+    <span class="c1"># create the function to use with pandas apply</span>
+
+    <span class="k">def</span> <span class="nf">thin_by_distance</span><span class="p">(</span><span class="n">curRow</span><span class="p">,</span> <span class="n">filter_text</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">prevPt</span>
+        <span class="k">if</span> <span class="n">prevPt</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">prevPt</span> <span class="o">=</span> <span class="n">curRow</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">curRow</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">prevPt</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">thinDistCSunits</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">filter_text</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prevPt</span> <span class="o">=</span> <span class="n">curRow</span>
+
+    <span class="k">global</span> <span class="n">prevPt</span>
+    <span class="n">prevPt</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">subset</span> <span class="o">=</span> <span class="n">point_geodataframe</span><span class="p">[</span><span class="n">point_geodataframe</span><span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">drop_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">ea</span> <span class="k">for</span> <span class="n">ea</span> <span class="ow">in</span> <span class="n">subset</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">if</span> <span class="n">ea</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;FID&#39;</span><span class="p">]]</span>
+    <span class="n">subset</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop_cols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Update/Add x,y coordinates to match coordinate system</span>
+    <span class="k">for</span> <span class="n">argCheck</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;pointX&#39;</span><span class="p">,</span> <span class="s1">&#39;pointY&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">argCheck</span> <span class="ow">in</span> <span class="n">point_geodataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> already exists. Values will be updated&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">argCheck</span><span class="p">))</span>
+
+    <span class="n">subset</span><span class="p">[</span><span class="s1">&#39;pointX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">subset</span><span class="p">[</span><span class="s1">&#39;pointY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="n">iloop</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">sortBy</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;pointXY&#39;</span><span class="p">,</span> <span class="s1">&#39;pointX&#39;</span><span class="p">,</span> <span class="s1">&#39;pointY&#39;</span><span class="p">]:</span>
+        <span class="n">filterTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">sortBy</span> <span class="o">!=</span> <span class="s1">&#39;pointXY&#39;</span><span class="p">:</span>
+            <span class="n">subset</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">sortBy</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">filter_string</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">m)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sortBy</span><span class="p">,</span> <span class="n">thinDistCSunits</span><span class="p">)</span>
+        <span class="n">subset</span><span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">thin_by_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">filter_string</span><span class="p">))</span>
+
+        <span class="n">stepTotal</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">subset</span><span class="p">[</span><span class="n">subset</span><span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">filter_string</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">stepTotal</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">iloop</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">subset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">subset</span><span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">filter_string</span><span class="p">,</span> <span class="s1">&#39;filter_inc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iloop</span>
+
+            <span class="c1"># update(join/merge) the master filter column with results from thinning.</span>
+            <span class="n">point_geodataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">point_geodataframe</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">subset</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="s1">&#39;filter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span><span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span>
+            <span class="n">point_geodataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">point_geodataframe</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">subset</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="s1">&#39;filter_inc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span><span class="p">[</span><span class="s1">&#39;filter_inc&#39;</span><span class="p">]</span>
+
+        <span class="n">subset</span> <span class="o">=</span> <span class="n">subset</span><span class="p">[</span><span class="n">subset</span><span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subset</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;There are no features left after </span><span class="si">{}</span><span class="s2">. Check the coordinate systems and try again&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sortBy</span><span class="p">))</span>
+
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="s1"> </span><span class="si">{:&gt;10,}</span><span class="s1">   </span><span class="si">{dur:&lt;15}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Filter by distance - </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filter_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;point&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)),</span>
+                                                  <span class="nb">len</span><span class="p">(</span><span class="n">subset</span><span class="p">),</span> <span class="s1">&#39;del </span><span class="si">{}</span><span class="s1"> pts&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stepTotal</span><span class="p">),</span>
+                                                  <span class="n">dur</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">filterTime</span><span class="p">)))</span>
+
+    <span class="c1"># set sort back to original row order</span>
+    <span class="c1"># point_geodataframe.sort_index(axis=1, ascending=True, inplace=True)</span>
+
+    <span class="n">filterTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get_debug_mode</span><span class="p">():</span>  <span class="c1"># save with filter column.</span>
+        <span class="n">save_geopandas_tofile</span><span class="p">(</span><span class="n">point_geodataframe</span><span class="p">,</span> <span class="n">out_filename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">out_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">save_geopandas_tofile</span><span class="p">(</span><span class="n">point_geodataframe</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;filter&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">out_filename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">point_geodataframe</span></div>
+
+
+<div class="viewcode-block" id="move_or_copy_vector_file"><a class="viewcode-back" href="../../reference/pyprecag.vector_ops.html#pyprecag.vector_ops.move_or_copy_vector_file">[docs]</a><span class="k">def</span> <span class="nf">move_or_copy_vector_file</span><span class="p">(</span><span class="n">in_filename</span><span class="p">,</span> <span class="n">out_filename</span><span class="p">,</span> <span class="n">keepInput</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Move, Rename or Copy a vector file from one name/location to another.</span>
+
+<span class="sd">       This uses the GDAL CopyDataSource and DeleteDataSource methods.</span>
+<span class="sd">       To Move/Rename - keepInput=False.   It will copy the file to new location then delete original.</span>
+<span class="sd">       To Copy - keepInput=True.</span>
+
+<span class="sd">       Args:</span>
+<span class="sd">           in_filename (str): The Input filename</span>
+<span class="sd">           out_filename (str): The output filename and location</span>
+<span class="sd">           keepInput (bool): if False will mimic a move/rename by copying the file then deleting the input file</span>
+<span class="sd">           overwrite (bool): If output exists it will be overwritten.</span>
+
+<span class="sd">       &quot;&quot;&quot;</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">in_filename</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Invalid path: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_filename</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">in_filename</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">out_filename</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input and output should be the same file type, ie both shapefiles&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">in_filename</span> <span class="o">==</span> <span class="n">out_filename</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input and output should have different file names&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">out_filename</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">overwrite</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Output Exists and overwrite is false: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_filename</span><span class="p">))</span>
+
+    <span class="n">vectDesc</span> <span class="o">=</span> <span class="n">VectorDescribe</span><span class="p">(</span><span class="n">in_filename</span><span class="p">)</span>
+    <span class="n">geoDF</span> <span class="o">=</span> <span class="n">vectDesc</span><span class="o">.</span><span class="n">open_geo_dataframe</span><span class="p">()</span>
+    <span class="n">geoDF</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">out_filename</span><span class="p">,</span> <span class="n">crs_wkt</span><span class="o">=</span><span class="n">vectDesc</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">crs_wkt</span><span class="p">)</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Successfully renamed from </span><span class="se">\n</span><span class="s1">   </span><span class="si">{}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">    to    </span><span class="se">\n</span><span class="s1">   </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_filename</span><span class="p">,</span> <span class="n">out_filename</span><span class="p">))</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> complete !!  Duration H:M:SS - </span><span class="si">{dur}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">,</span>
+                                                              <span class="n">dur</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="explode_multi_part_features"><a class="viewcode-back" href="../../reference/pyprecag.vector_ops.html#pyprecag.vector_ops.explode_multi_part_features">[docs]</a><span class="k">def</span> <span class="nf">explode_multi_part_features</span><span class="p">(</span><span class="n">in_shapefilename</span><span class="p">,</span> <span class="n">out_shapefilename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert Multipart Vector Features to Single Part Features.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_shapefilename (str): The input vector file, normally a shapefile</span>
+<span class="sd">        out_shapefilename (str): the resulting shapefile</span>
+
+<span class="sd">    Returns:None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">in_shapefilename</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Invalid path: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_shapefilename</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">in_shapefilename</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">out_shapefilename</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input and output should be the same file type, ie both shapefiles&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">in_shapefilename</span><span class="p">)</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">out_shapefilename</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input and output should have different file names&quot;</span><span class="p">)</span>
+
+    <span class="n">vectDesc</span> <span class="o">=</span> <span class="n">VectorDescribe</span><span class="p">(</span><span class="n">in_shapefilename</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;MULTI&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vectDesc</span><span class="o">.</span><span class="n">geometry_type</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Input shapefiles does not contain multi-part geometry&#39;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># open the original shapefile</span>
+    <span class="k">with</span> <span class="n">fionacoll</span><span class="p">(</span><span class="n">in_shapefilename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">source</span><span class="p">:</span>
+        <span class="c1"># create the new shapefile</span>
+        <span class="k">with</span> <span class="n">fionacoll</span><span class="p">(</span><span class="n">out_shapefilename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">vectDesc</span><span class="o">.</span><span class="n">epsg</span><span class="p">,</span>
+                       <span class="n">schema</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">schema</span><span class="p">)</span> <span class="k">as</span> <span class="n">output</span><span class="p">:</span>
+            <span class="c1"># iterate the features of the original shapefile</span>
+            <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">source</span><span class="p">:</span>
+                <span class="c1"># iterate the list of geometries in one element (split the MultiLineString)</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">(</span><span class="n">elem</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]):</span>
+                    <span class="c1"># write the line to the new shapefile</span>
+                    <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">({</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">mapping</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">elem</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]})</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> complete !!  Duration H:M:SS - </span><span class="si">{dur}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">,</span>
+                                                             <span class="n">dur</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="calculate_area_length_in_metres"><a class="viewcode-back" href="../../reference/pyprecag.vector_ops.html#pyprecag.vector_ops.calculate_area_length_in_metres">[docs]</a><span class="k">def</span> <span class="nf">calculate_area_length_in_metres</span><span class="p">(</span><span class="n">in_filename</span><span class="p">,</span> <span class="n">dissolve_overlap</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the total Area and Length in metres for an input polygon file.</span>
+
+<span class="sd">    If the input file is geographic, then the feature will be &#39;projected&#39; into wgs84 utm system</span>
+
+<span class="sd">    Currently there is no Summarize by Column or update existing features .. implemented (see TODO).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_filename (str): Input polygon file.</span>
+<span class="sd">        dissolve_overlap (bool): Return values after Dissolve ALL geometries.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list[area,length]: The Total Area and Length</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">in_filename</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Invalid path: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_filename</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">in_filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">source</span><span class="p">:</span>
+        <span class="n">inSRS</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">SpatialReference</span><span class="p">()</span>
+        <span class="n">inSRS</span><span class="o">.</span><span class="n">ImportFromProj4</span><span class="p">(</span><span class="n">to_string</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">crs</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inSRS</span><span class="o">.</span><span class="n">IsProjected</span><span class="p">():</span>
+            <span class="n">zone</span><span class="p">,</span> <span class="n">utmSRS</span><span class="p">,</span> <span class="n">wgs84SRS</span> <span class="o">=</span> <span class="n">pyprecag_crs</span><span class="o">.</span><span class="n">getUTMfromWGS84</span><span class="p">(</span><span class="o">*</span><span class="n">source</span><span class="o">.</span><span class="n">bounds</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+
+            <span class="c1"># Create the Project Transformation object</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">pyproj</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span>
+                                        <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="o">**</span><span class="n">source</span><span class="o">.</span><span class="n">crs</span><span class="p">),</span>
+                                        <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">utmSRS</span><span class="o">.</span><span class="n">ExportToProj4</span><span class="p">()))</span>
+
+        <span class="c1"># Store Results in a dictionary</span>
+        <span class="n">resultsDict</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="c1"># Store projected polygons</span>
+        <span class="n">polygonsGeom</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># loop through polygons collecting areas and lengths</span>
+        <span class="k">for</span> <span class="n">eaFeat</span> <span class="ow">in</span> <span class="n">source</span><span class="p">:</span>
+            <span class="c1"># get the geometry of the feature</span>
+            <span class="n">eaGeom</span> <span class="o">=</span> <span class="n">shape</span><span class="p">(</span><span class="n">eaFeat</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">])</span>
+
+            <span class="c1"># if this is geographic the it will be dd</span>
+            <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;origArea&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">eaGeom</span><span class="o">.</span><span class="n">area</span>
+            <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;origLength&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">eaGeom</span><span class="o">.</span><span class="n">length</span>
+
+            <span class="c1"># If inSRS is Geographic the reproject the feature to a projected system to get area in metres</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">inSRS</span><span class="o">.</span><span class="n">IsProjected</span><span class="p">():</span>
+                <span class="n">project</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">pyproj</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span>
+                                            <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="o">**</span><span class="n">source</span><span class="o">.</span><span class="n">crs</span><span class="p">),</span>
+                                            <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">utmSRS</span><span class="o">.</span><span class="n">ExportToProj4</span><span class="p">()))</span>
+
+                <span class="c1"># Get the projected geometry</span>
+                <span class="n">eaGeom</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">eaGeom</span><span class="p">)</span>
+
+            <span class="c1"># store numbers in metres</span>
+            <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;Area_m&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">eaGeom</span><span class="o">.</span><span class="n">area</span>
+            <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;Length_m&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">eaGeom</span><span class="o">.</span><span class="n">length</span>
+
+            <span class="c1"># If overlaps are to be dissolved we need a projected geometry collection</span>
+            <span class="k">if</span> <span class="n">dissolve_overlap</span><span class="p">:</span>
+                <span class="n">polygonsGeom</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eaGeom</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dissolve_overlap</span><span class="p">:</span>
+            <span class="c1"># Run the dissolve.</span>
+            <span class="n">polygondis</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">unary_union</span><span class="p">(</span><span class="n">polygonsGeom</span><span class="p">)</span>
+            <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;Area_m_NoOverlap&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">polygondis</span><span class="o">.</span><span class="n">area</span>
+            <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;Length_m_NoOverlap&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">polygondis</span><span class="o">.</span><span class="n">length</span>
+
+    <span class="c1"># get the final values</span>
+    <span class="n">area</span> <span class="o">=</span> <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;Area_m&#39;</span><span class="p">]</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;Length_m&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">dissolve_overlap</span><span class="p">:</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;Area_m_NoOverlap&#39;</span><span class="p">]</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;Length_m_NoOverlap&#39;</span><span class="p">]</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CRS:              </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">to_string</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">crs</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inSRS</span><span class="o">.</span><span class="n">IsProjected</span><span class="p">():</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{:&lt;25}</span><span class="s1"> Area (dd): </span><span class="si">{:&gt;20.5f}</span><span class="s1">   Length (dd): </span><span class="si">{:&gt;20.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;No Overlap-&#39;</span><span class="p">,</span>
+                                                                                     <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;origArea&#39;</span><span class="p">],</span>
+                                                                                     <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;origLength&#39;</span><span class="p">]))</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Projected To CRS: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">utmSRS</span><span class="o">.</span><span class="n">GetAttrValue</span><span class="p">(</span><span class="s2">&quot;PROJCS&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{:&lt;25}</span><span class="s1"> Area (m) : </span><span class="si">{:&gt;20.5f}</span><span class="s1">   Length (m) : </span><span class="si">{:&gt;20.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Total with Overlap-&#39;</span><span class="p">,</span>
+                                                                                 <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;Area_m&#39;</span><span class="p">],</span>
+                                                                                 <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;Length_m&#39;</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="n">dissolve_overlap</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{:&lt;25}</span><span class="s1"> Area (m) : </span><span class="si">{:&gt;20.5f}</span><span class="s1">   Length (m) : </span><span class="si">{:&gt;20.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Total with No Overlap-&#39;</span><span class="p">,</span>
+                                                                                     <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;Area_m_NoOverlap&#39;</span><span class="p">],</span>
+                                                                                     <span class="n">resultsDict</span><span class="p">[</span><span class="s1">&#39;Length_m_NoOverlap&#39;</span><span class="p">]))</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> complete !!  Duration H:M:SS - </span><span class="si">{dur}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">,</span>
+                                                            <span class="n">dur</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">area</span><span class="p">,</span> <span class="n">length</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

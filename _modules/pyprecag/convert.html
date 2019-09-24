@@ -1,0 +1,653 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.convert &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyprecag.convert</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyprecag.convert</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Format conversion routines.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span>  <span class="nn">datetime</span> <span class="k">import</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas.core.dtypes.common</span> <span class="k">import</span> <span class="n">is_string_dtype</span>
+
+<span class="kn">from</span> <span class="nn">osgeo</span> <span class="k">import</span> <span class="n">ogr</span><span class="p">,</span> <span class="n">gdal</span>
+<span class="kn">import</span> <span class="nn">geopandas</span>
+<span class="kn">from</span> <span class="nn">geopandas</span> <span class="k">import</span> <span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">GeoSeries</span>
+
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">from</span> <span class="nn">rasterio</span> <span class="k">import</span> <span class="n">features</span>
+
+<span class="kn">from</span> <span class="nn">fiona</span> <span class="k">import</span> <span class="n">collection</span> <span class="k">as</span> <span class="n">fionacoll</span>
+<span class="kn">from</span> <span class="nn">fiona.crs</span> <span class="k">import</span> <span class="n">from_epsg</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">LineString</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">crs</span> <span class="k">as</span> <span class="n">pyprecag_crs</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">TEMPDIR</span><span class="p">,</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">.describe</span> <span class="k">import</span> <span class="n">CsvDescribe</span><span class="p">,</span> <span class="n">predictCoordinateColumnNames</span><span class="p">,</span> <span class="n">VectorDescribe</span><span class="p">,</span> \
+    <span class="n">save_geopandas_tofile</span>
+
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="k">import</span> <span class="n">GeometryError</span>
+<span class="kn">from</span> <span class="nn">.raster_ops</span> <span class="k">import</span> <span class="n">raster_snap_extent</span><span class="p">,</span> <span class="n">create_raster_transform</span>
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">LOGGER</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="numeric_pixelsize_to_string"><a class="viewcode-back" href="../../reference/pyprecag.convert.html#pyprecag.convert.numeric_pixelsize_to_string">[docs]</a><span class="k">def</span> <span class="nf">numeric_pixelsize_to_string</span><span class="p">(</span><span class="n">pixelsize_metres</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a numeric pixel size to a string with the appropriate units for use in file names.</span>
+<span class="sd">    For example 0.40 is 40cm,  0.125 is 125mm, 1.5km is 1500m,  2.0 is 2m, 6000 is 6km</span>
+<span class="sd">    Args:</span>
+<span class="sd">        pixelsize_metres (numeric): The pixel size in meters.</span>
+
+<span class="sd">    Returns (str): a string representation of the pixel size</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pixelsize_metres</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Pixel size should be numeric (int, float etc)&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">pixelsize_metres</span> <span class="o">%</span> <span class="mf">1000.0</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># or km</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">km&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pixelsize_metres</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">pixelsize_metres</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># is in m</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">m&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pixelsize_metres</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">pixelsize_metres</span> <span class="o">*</span> <span class="mf">100.0</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># is in cm</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">cm&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pixelsize_metres</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># or mm</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">mm&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pixelsize_metres</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="point_to_point_bearing"><a class="viewcode-back" href="../../reference/pyprecag.convert.html#pyprecag.convert.point_to_point_bearing">[docs]</a><span class="k">def</span> <span class="nf">point_to_point_bearing</span><span class="p">(</span><span class="n">pt1</span><span class="p">,</span> <span class="n">pt2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate bearing from north between two points &quot;&quot;&quot;</span>
+    <span class="c1"># variation of  https://community.esri.com/thread/27393</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pt1</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">pt1</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">pt1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pt2</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">pt2</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">pt2</span><span class="p">)</span>
+
+    <span class="n">bearing</span> <span class="o">=</span> <span class="mi">180</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">((</span><span class="n">pt2</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">pt1</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="n">pt2</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">pt1</span><span class="o">.</span><span class="n">y</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">180</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bearing</span></div>
+
+
+<div class="viewcode-block" id="line_bearing"><a class="viewcode-back" href="../../reference/pyprecag.convert.html#pyprecag.convert.line_bearing">[docs]</a><span class="k">def</span> <span class="nf">line_bearing</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; The bearing on the line between the start and end nodes/points&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">LineString</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">geometry</span>
+    <span class="k">return</span> <span class="n">point_to_point_bearing</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="deg_to_16_compass_pts"><a class="viewcode-back" href="../../reference/pyprecag.convert.html#pyprecag.convert.deg_to_16_compass_pts">[docs]</a><span class="k">def</span> <span class="nf">deg_to_16_compass_pts</span><span class="p">(</span><span class="n">degrees</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a compass bearing from north using 16 cardinal directions</span>
+<span class="sd">    Args:</span>
+<span class="sd">        degrees (float): Degrees from north</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        direction(str) : letters representing the compass point</span>
+<span class="sd">    source: https://stackoverflow.com/a/7490772</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># fix if a negative number is used ie -45 turns into 315</span>
+    <span class="k">if</span> <span class="n">degrees</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">degrees</span> <span class="o">=</span> <span class="mf">360.0</span> <span class="o">+</span> <span class="n">degrees</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">degrees</span> <span class="o">/</span> <span class="mf">22.5</span><span class="p">)</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;NNE&quot;</span><span class="p">,</span> <span class="s2">&quot;NE&quot;</span><span class="p">,</span> <span class="s2">&quot;ENE&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;ESE&quot;</span><span class="p">,</span> <span class="s2">&quot;SE&quot;</span><span class="p">,</span> <span class="s2">&quot;SSE&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;SSW&quot;</span><span class="p">,</span> <span class="s2">&quot;SW&quot;</span><span class="p">,</span> <span class="s2">&quot;WSW&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;WNW&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;NW&quot;</span><span class="p">,</span> <span class="s2">&quot;NNW&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">arr</span><span class="p">[(</span><span class="n">val</span> <span class="o">%</span> <span class="mi">16</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="deg_to_8_compass_pts"><a class="viewcode-back" href="../../reference/pyprecag.convert.html#pyprecag.convert.deg_to_8_compass_pts">[docs]</a><span class="k">def</span> <span class="nf">deg_to_8_compass_pts</span><span class="p">(</span><span class="n">degrees</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a compass bearing from north using 8 cardinal directions</span>
+<span class="sd">    Args:</span>
+<span class="sd">        degrees (float): Degrees from north</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        direction(str) : letters representing the compass point</span>
+
+<span class="sd">    source: variation of https://stackoverflow.com/a/7490772</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># fix if a  negative number is used</span>
+    <span class="k">if</span> <span class="n">degrees</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">degrees</span> <span class="o">=</span> <span class="mf">360.0</span> <span class="o">+</span> <span class="n">degrees</span>
+
+    <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">degrees</span> <span class="o">/</span> <span class="mf">45.0</span><span class="p">)</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;NE&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;SE&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;SW&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;NW&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">arr</span><span class="p">[(</span><span class="n">val</span> <span class="o">%</span> <span class="mi">8</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="drop_z"><a class="viewcode-back" href="../../reference/pyprecag.convert.html#pyprecag.convert.drop_z">[docs]</a><span class="k">def</span> <span class="nf">drop_z</span><span class="p">(</span><span class="n">geom</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">LineString</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">LineString</span><span class="p">([</span><span class="n">xy</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">xy</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">coords</span><span class="p">)])</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">Point</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Point</span><span class="p">([</span><span class="n">geom</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]])</span></div>
+
+
+<div class="viewcode-block" id="text_rotation"><a class="viewcode-back" href="../../reference/pyprecag.convert.html#pyprecag.convert.text_rotation">[docs]</a><span class="k">def</span> <span class="nf">text_rotation</span><span class="p">(</span><span class="n">pt1</span><span class="p">,</span> <span class="n">pt2</span><span class="p">):</span>
+    <span class="c1"># calculate an angle to use for labelling in matplotlib plots</span>
+    <span class="c1"># https://stackoverflow.com/a/35825527</span>
+    <span class="n">rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">pt2</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">pt1</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">pt2</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">pt1</span><span class="o">.</span><span class="n">x</span><span class="p">))</span>
+    <span class="c1"># need to adjust slighlt to avoid upside down labels</span>
+    <span class="k">if</span> <span class="n">rotation</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">100</span><span class="p">:</span>
+        <span class="n">rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">pt1</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">pt2</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">pt1</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">pt2</span><span class="o">.</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">rotation</span> <span class="o">&gt;=</span> <span class="mi">170</span><span class="p">:</span>
+        <span class="n">rotation</span> <span class="o">=</span> <span class="n">rotation</span> <span class="o">-</span> <span class="mi">180</span>
+    <span class="k">return</span> <span class="n">rotation</span></div>
+
+
+<div class="viewcode-block" id="convert_polygon_to_grid"><a class="viewcode-back" href="../../reference/pyprecag.convert.html#pyprecag.convert.convert_polygon_to_grid">[docs]</a><span class="k">def</span> <span class="nf">convert_polygon_to_grid</span><span class="p">(</span><span class="n">in_shapefilename</span><span class="p">,</span>
+                            <span class="n">out_rasterfilename</span><span class="p">,</span>
+                            <span class="n">pixel_size</span><span class="p">,</span>
+                            <span class="n">nodata_val</span><span class="o">=-</span><span class="mi">9999</span><span class="p">,</span>
+                            <span class="n">snap_extent_to_pixel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert a polygon shapefile to a raster for a set pixel size.</span>
+
+<span class="sd">    source : http://ceholden.github.io/open-geo-tutorial/python/chapter_4_vector.html</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_shapefilename (str): A polygon shapefile to rasterise</span>
+<span class="sd">        out_rasterfilename (str): the output raster name</span>
+<span class="sd">        pixel_size (float): the pixel size for the raster</span>
+<span class="sd">        nodata_val (int):the value to use for nodata</span>
+<span class="sd">        snap_extent_to_pixel (bool):round the extent coordinates to be divisible by the pixel size</span>
+<span class="sd">        overwrite (bool): if true overwrite existing output file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">in_shapefilename</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Invalid path: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_shapefilename</span><span class="p">))</span>
+
+    <span class="n">shp_ds</span> <span class="o">=</span> <span class="n">ogr</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">in_shapefilename</span><span class="p">)</span>
+    <span class="n">shp_layer</span> <span class="o">=</span> <span class="n">shp_ds</span><span class="o">.</span><span class="n">GetLayer</span><span class="p">()</span>
+
+    <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">shp_layer</span><span class="o">.</span><span class="n">GetExtent</span><span class="p">()</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Vector Extent: LL:</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">))</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">               UR:</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">))</span>
+
+    <span class="c1"># Snap output grids to a multiple of the grid size, allowing adjacent blocks to align nicely.</span>
+    <span class="k">if</span> <span class="n">snap_extent_to_pixel</span><span class="p">:</span>
+        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">raster_snap_extent</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Raster Extent: Snap is </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snap_extent_to_pixel</span><span class="p">))</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">           LL:</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">))</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">           UR:</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">))</span>
+
+    <span class="n">x_cols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_size</span><span class="p">)</span>
+    <span class="n">y_rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_size</span><span class="p">)</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">           Cols: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_cols</span><span class="p">))</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">           Rows: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_rows</span><span class="p">))</span>
+
+    <span class="c1"># for pixel data types see http://www.gdal.org/gdal_8h.html#a22e22ce0a55036a96f652765793fb7a4</span>
+    <span class="n">tif_drv</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">GetDriverByName</span><span class="p">(</span><span class="s1">&#39;GTiff&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">tif_drv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># If the above Fails then here is an alternate version.</span>
+        <span class="n">tif_drv</span> <span class="o">=</span> <span class="n">Find_GDALDriverByName</span><span class="p">(</span><span class="s1">&#39;GTiff&#39;</span><span class="p">)</span>
+
+    <span class="n">raster_ds</span> <span class="o">=</span> <span class="n">tif_drv</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="n">out_rasterfilename</span><span class="p">,</span> <span class="n">x_cols</span><span class="p">,</span> <span class="n">y_rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_Int16</span><span class="p">)</span>
+
+    <span class="c1"># Define spatial reference</span>
+    <span class="n">raster_ds</span><span class="o">.</span><span class="n">SetProjection</span><span class="p">(</span><span class="n">shp_layer</span><span class="o">.</span><span class="n">GetSpatialRef</span><span class="p">()</span><span class="o">.</span><span class="n">ExportToWkt</span><span class="p">())</span>
+    <span class="n">ras_y_max</span> <span class="o">=</span> <span class="n">y_min</span> <span class="o">+</span> <span class="p">(</span><span class="n">y_rows</span> <span class="o">*</span> <span class="n">pixel_size</span><span class="p">)</span>
+    <span class="n">raster_ds</span><span class="o">.</span><span class="n">SetGeoTransform</span><span class="p">((</span><span class="n">x_min</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ras_y_max</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">pixel_size</span><span class="p">))</span>
+
+    <span class="n">r_band</span> <span class="o">=</span> <span class="n">raster_ds</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">r_band</span><span class="o">.</span><span class="n">SetNoDataValue</span><span class="p">(</span><span class="n">nodata_val</span><span class="p">)</span>
+    <span class="n">r_band</span><span class="o">.</span><span class="n">Fill</span><span class="p">(</span><span class="n">nodata_val</span><span class="p">)</span>
+
+    <span class="c1"># Rasterize the shapefile layer to our new dataset</span>
+    <span class="c1"># options = [&#39;ALL_TOUCHED=TRUE&#39;,&#39;ATTRIBUTE=id&#39;]</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">RasterizeLayer</span><span class="p">(</span><span class="n">raster_ds</span><span class="p">,</span>  <span class="c1"># output to our new dataset</span>
+                              <span class="p">[</span><span class="mi">1</span><span class="p">],</span>  <span class="c1"># output to our new datasets first band</span>
+                              <span class="n">shp_layer</span><span class="p">,</span>  <span class="c1"># rasterize this layer</span>
+                              <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># ignore transformations since we&#39;re in same projection</span>
+                              <span class="n">burn_values</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>  <span class="c1"># burn value 1</span>
+                              <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ALL_TOUCHED=FALSE&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error rasterizing layer: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">),</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="se">\t</span><span class="si">{dur:&lt;15}</span><span class="se">\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                                                   <span class="n">dur</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span>
+
+    <span class="c1"># close the data sources</span>
+    <span class="n">r_band</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">raster_ds</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">shp_layer</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">shp_ds</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="convert_grid_to_vesper"><a class="viewcode-back" href="../../reference/pyprecag.convert.html#pyprecag.convert.convert_grid_to_vesper">[docs]</a><span class="k">def</span> <span class="nf">convert_grid_to_vesper</span><span class="p">(</span><span class="n">in_rasterfilename</span><span class="p">,</span> <span class="n">out_vesperfilename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert a Grid the format compatible with vesper.</span>
+
+<span class="sd">       The vesper format contains the xy coordinates for the center of each pixel with one space</span>
+<span class="sd">       before the x and three spaces between the x and y values.</span>
+
+<span class="sd">       The coordinates are written as rows from the Upper Left corner of the raster.</span>
+
+<span class="sd">       Args:</span>
+<span class="sd">           in_rasterfilename (str):An input raster file</span>
+<span class="sd">           out_vesperfilename (str): Save the output vesper file to this file.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">in_rasterfilename</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Invalid path: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_rasterfilename</span><span class="p">))</span>
+
+    <span class="kn">import</span> <span class="nn">rasterio</span>  <span class="c1"># for some reason this works better here than at the top</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">in_rasterfilename</span><span class="p">))</span> <span class="k">as</span> <span class="n">oRasterDS</span><span class="p">:</span>
+        <span class="n">band1</span> <span class="o">=</span> <span class="n">oRasterDS</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_vesperfilename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">vesFile</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">iRowY</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">oRasterDS</span><span class="o">.</span><span class="n">height</span><span class="p">):</span>  <span class="c1"># get starting row</span>
+                <span class="k">for</span> <span class="n">iColX</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">oRasterDS</span><span class="o">.</span><span class="n">width</span><span class="p">)):</span>  <span class="c1"># process through cols</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">band1</span><span class="p">[</span><span class="n">iRowY</span><span class="p">,</span> <span class="n">iColX</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="n">oRasterDS</span><span class="o">.</span><span class="n">nodatavals</span><span class="p">:</span>
+                        <span class="c1"># Get XY coordinates for current row/col</span>
+                        <span class="c1"># takes rows,cols and returns xy coord for cell center</span>
+                        <span class="n">xy</span> <span class="o">=</span> <span class="n">oRasterDS</span><span class="o">.</span><span class="n">xy</span><span class="p">(</span><span class="n">iRowY</span><span class="p">,</span> <span class="n">iColX</span><span class="p">)</span>
+                        <span class="n">vesFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; </span><span class="si">{}</span><span class="s1">   </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xy</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="se">\t</span><span class="si">{dur:&lt;15}</span><span class="se">\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                                               <span class="n">dur</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span>
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="add_point_geometry_to_dataframe"><a class="viewcode-back" href="../../reference/pyprecag.convert.html#pyprecag.convert.add_point_geometry_to_dataframe">[docs]</a><span class="k">def</span> <span class="nf">add_point_geometry_to_dataframe</span><span class="p">(</span><span class="n">in_dataframe</span><span class="p">,</span> <span class="n">coord_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">coord_columns_epsg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">out_epsg</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Add Point geometry to a pandas or geopandas data frame through sets of coordinate columns.</span>
+<span class="sd">       If required, it will also reproject to the chosen EPSG coordinate system</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_dataframe (DataFrame): The input dataframe. This could be a pandas or geopandas dataframe</span>
+<span class="sd">        coord_columns (list) : A list of the columns representing coordinates. If None, it will be</span>
+<span class="sd">                      predicted.</span>
+<span class="sd">        coord_columns_epsg (int):  The EPSG number representing the coordinates inside the csv file</span>
+<span class="sd">        out_epsg (int): The EPSG number representing the required output coordinates system.</span>
+<span class="sd">                        Use  0 for no projection</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        (GeoDataFrame): A geodataframe of Points with ALL attributes.</span>
+
+<span class="sd">    Modified from: https://gis.stackexchange.com/a/182234</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_dataframe</span><span class="p">,</span> <span class="p">(</span><span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input points should be a geopandas dataframe&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">argCheck</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;coord_columns_epsg&#39;</span><span class="p">,</span> <span class="n">coord_columns_epsg</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;out_epsg&#39;</span><span class="p">,</span> <span class="n">out_epsg</span><span class="p">)]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> must be a integer.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="n">coord_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">coord_columns</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coord_columns</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Coordinate columns should be a list.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">coord_columns</span><span class="p">))</span>
+
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">coord_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">eaFld</span> <span class="ow">in</span> <span class="n">coord_columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">eaFld</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">in_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Column </span><span class="si">{}</span><span class="s1"> does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eaFld</span><span class="p">))</span>
+        <span class="n">x_column</span><span class="p">,</span> <span class="n">y_column</span> <span class="o">=</span> <span class="n">coord_columns</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x_column</span><span class="p">,</span> <span class="n">y_column</span> <span class="o">=</span> <span class="n">predictCoordinateColumnNames</span><span class="p">(</span><span class="n">in_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;FID&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">in_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="c1"># insert feature id as column as first column and populate it using row number.</span>
+        <span class="n">in_dataframe</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;FID&#39;</span><span class="p">,</span> <span class="n">in_dataframe</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+    <span class="c1"># combine lat and lon column to a shapely Point() object</span>
+    <span class="n">in_dataframe</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_dataframe</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Point</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">x_column</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">y_column</span><span class="p">]))),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Now, convert the pandas DataFrame into a GeoDataFrame. The geopandas constructor expects a</span>
+    <span class="c1"># geometry column which can consist of shapely geometry objects, so the column we created is</span>
+    <span class="c1"># just fine:</span>
+    <span class="n">gdf_csv</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">in_dataframe</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="s1">&#39;geometry&#39;</span><span class="p">,</span>
+                                     <span class="n">crs</span><span class="o">=</span><span class="n">from_epsg</span><span class="p">(</span><span class="n">coord_columns_epsg</span><span class="p">))</span>
+
+    <span class="c1"># drop the original geometry columns to avoid confusion</span>
+    <span class="n">gdf_csv</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="n">x_column</span><span class="p">,</span> <span class="n">y_column</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">gdf_crs</span> <span class="o">=</span> <span class="n">pyprecag_crs</span><span class="o">.</span><span class="n">crs</span><span class="p">()</span>
+    <span class="n">gdf_crs</span><span class="o">.</span><span class="n">getFromEPSG</span><span class="p">(</span><span class="n">coord_columns_epsg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">out_epsg</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">gdf_csv</span><span class="o">.</span><span class="n">total_bounds</span>
+        <span class="n">out_epsg</span> <span class="o">=</span> <span class="n">pyprecag_crs</span><span class="o">.</span><span class="n">getProjectedCRSForXY</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">coord_columns_epsg</span><span class="p">)</span><span class="o">.</span><span class="n">epsg_number</span>
+
+    <span class="k">if</span> <span class="n">out_epsg</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">gdf_csv</span> <span class="o">=</span> <span class="n">gdf_csv</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="n">out_epsg</span><span class="p">)</span>
+        <span class="n">gdf_crs</span><span class="o">.</span><span class="n">getFromEPSG</span><span class="p">(</span><span class="n">out_epsg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">gdf_csv</span><span class="p">,</span> <span class="n">gdf_crs</span></div>
+
+
+<div class="viewcode-block" id="convert_csv_to_points"><a class="viewcode-back" href="../../reference/pyprecag.convert.html#pyprecag.convert.convert_csv_to_points">[docs]</a><span class="k">def</span> <span class="nf">convert_csv_to_points</span><span class="p">(</span><span class="n">in_csvfilename</span><span class="p">,</span> <span class="n">out_shapefilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coord_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">coord_columns_epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">out_epsg</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Converts a comma or tab delimited file to a shapefile.</span>
+
+<span class="sd">    If EPSG is omitted it will default to 0 or unknown.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_csvfilename (str):   Input CSV or Txt (tab) file.</span>
+<span class="sd">        out_shapefilename (str):  Output Shapefile Name. If path is excluded it uses TEMPDIR</span>
+<span class="sd">        coord_columns (list) : Column list representing coordinates. If None, it will be predicted.</span>
+<span class="sd">        coord_columns_epsg (int):  EPSG number for specified coord_columns. Default is 4326 (WGS84)</span>
+<span class="sd">        out_epsg (int):  The EPSG number representing the required output coordinates system.</span>
+<span class="sd">                        - OR -</span>
+<span class="sd">                        0  is no reprojection</span>
+<span class="sd">                        -1 calculate utm zonal projection</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (GeoDataFrame): A geodataframe of Points with ALL attributes.</span>
+<span class="sd">        (pyprecag_crs): The coordinate system details of the dataframe</span>
+
+<span class="sd">    Modified from:  https://gis.stackexchange.com/a/182234</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">in_csvfilename</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Invalid path: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_csvfilename</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">argCheck</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;coord_columns_epsg&#39;</span><span class="p">,</span> <span class="n">coord_columns_epsg</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;out_epsg&#39;</span><span class="p">,</span> <span class="n">out_epsg</span><span class="p">)]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> must be a integer.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="n">desc_csv</span> <span class="o">=</span> <span class="n">CsvDescribe</span><span class="p">(</span><span class="n">in_csvfilename</span><span class="p">)</span>
+    <span class="n">pdf_csv</span> <span class="o">=</span> <span class="n">desc_csv</span><span class="o">.</span><span class="n">open_pandas_dataframe</span><span class="p">()</span>
+
+    <span class="n">gdf_csv</span><span class="p">,</span> <span class="n">gdf_crs</span> <span class="o">=</span> <span class="n">add_point_geometry_to_dataframe</span><span class="p">(</span><span class="n">pdf_csv</span><span class="p">,</span> <span class="n">coord_columns</span><span class="p">,</span>
+                                                       <span class="n">coord_columns_epsg</span><span class="p">,</span> <span class="n">out_epsg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get_debug_mode</span><span class="p">()</span> <span class="ow">or</span> <span class="n">out_shapefilename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">out_shapefilename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out_shapefilename</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">.shp&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">in_csvfilename</span><span class="p">))[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">inspect</span><span class="o">.</span><span class="n">getframeinfo</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">())[</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="n">save_geopandas_tofile</span><span class="p">(</span><span class="n">gdf_csv</span><span class="p">,</span> <span class="n">out_shapefilename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="se">\t</span><span class="si">{dur:&lt;15}</span><span class="se">\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                                               <span class="n">dur</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">gdf_csv</span><span class="p">,</span> <span class="n">gdf_crs</span></div>
+
+
+<div class="viewcode-block" id="convert_polygon_feature_to_raster"><a class="viewcode-back" href="../../reference/pyprecag.convert.html#pyprecag.convert.convert_polygon_feature_to_raster">[docs]</a><span class="k">def</span> <span class="nf">convert_polygon_feature_to_raster</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nodata_val</span><span class="o">=-</span><span class="mi">9999</span><span class="p">,</span>
+                                      <span class="n">snap_extent_to_pixel</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert a feature into a raster (block grid)</span>
+
+<span class="sd">    The &quot;value&quot; argument can be a numeric, or the name of a feature column. If the feature column</span>
+<span class="sd">    is a string, then the index value will be used to assign a value to the raster.</span>
+
+<span class="sd">    By default, snap_extent_to_pixel is true and is used to snap the bounding coordinates to</span>
+<span class="sd">    a pixel edge.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">       feature (pandas.core.series.Series): a polygon feature to convert to a raster</span>
+<span class="sd">       pixel_size (int, float]: the pixel size for the raster</span>
+<span class="sd">       value (int, float, str): pixel value. A column from the feature can be used</span>
+<span class="sd">       nodata_val (int, float): nodata value</span>
+<span class="sd">       snap_extent_to_pixel (bool): round the extent coordinates to be divisible by the pixel size</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       burned (numpy.ndarray) : The array representing the raster data</span>
+<span class="sd">       Dict[str, int]] : The rasterio meta kwargs required for writing the array to disk.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input feature should be a geopandas series&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pixel_size</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Pixel size must be an integer or floating number.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;value&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Value string </span><span class="si">{}</span><span class="s1"> is not a column name&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Value should be a column name, or a number&#39;</span><span class="p">)</span>
+
+    <span class="n">transform</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">bbox</span> <span class="o">=</span> <span class="n">create_raster_transform</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span>
+                                                             <span class="n">pixel_size</span><span class="p">,</span> <span class="n">snap_extent_to_pixel</span><span class="p">)</span>
+
+    <span class="n">gdf_feat</span> <span class="o">=</span> <span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">GeoSeries</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">geometry</span><span class="p">),</span>
+                            <span class="n">geometry</span><span class="o">=</span><span class="n">GeoSeries</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+
+    <span class="c1"># create an affine transformation matrix to associate the array to the coordinates.</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">gdf_feat</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_string_dtype</span><span class="p">(</span><span class="n">gdf_feat</span><span class="p">[</span><span class="n">value</span><span class="p">]):</span>
+            <span class="n">shapes</span> <span class="o">=</span> <span class="p">((</span><span class="n">geom</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">geom</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">gdf_feat</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="p">(</span><span class="n">gdf_feat</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shapes</span> <span class="o">=</span> <span class="p">((</span><span class="n">geom</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">geom</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">gdf_feat</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">gdf_feat</span><span class="p">[</span><span class="n">value</span><span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="p">((</span><span class="n">geom</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">gdf_feat</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+
+    <span class="n">burned</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">rasterize</span><span class="p">(</span><span class="n">shapes</span><span class="o">=</span><span class="n">shapes</span><span class="p">,</span> <span class="n">out_shape</span><span class="o">=</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">),</span> <span class="n">fill</span><span class="o">=</span><span class="n">nodata_val</span><span class="p">,</span>
+                                <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+                <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+                <span class="n">nodata</span><span class="o">=</span><span class="n">nodata_val</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">get_minimum_dtype</span><span class="p">(</span><span class="n">burned</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">burned</span><span class="p">,</span> <span class="n">meta</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

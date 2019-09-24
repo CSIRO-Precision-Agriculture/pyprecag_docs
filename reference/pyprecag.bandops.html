@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.bandops &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyprecag.config" href="pyprecag.config.html" />
+    <link rel="prev" title="API Reference" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pyprecag.bandops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.config.html">pyprecag.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.convert.html">pyprecag.convert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.crs.html">pyprecag.crs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.describe.html">pyprecag.describe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.errors.html">pyprecag.errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.kriging_ops.html">pyprecag.kriging_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.processing.html">pyprecag.processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.raster_ops.html">pyprecag.raster_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.table_ops.html">pyprecag.table_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.vector_ops.html">pyprecag.vector_ops</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+        
+      <li>pyprecag.bandops</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/reference/pyprecag.bandops.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pyprecag-bandops">
+<h1>pyprecag.bandops<a class="headerlink" href="#pyprecag-bandops" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-pyprecag.bandops"></span><dl class="class">
+<dt id="pyprecag.bandops.BandMapping">
+<em class="property">class </em><code class="descclassname">pyprecag.bandops.</code><code class="descname">BandMapping</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/bandops.html#BandMapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.bandops.BandMapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary used to manage band types and band numbers.</p>
+<p>If it has not been set it will have the default value of 0</p>
+<p>The list of keys is confined to those in __defaults, values must be integers.</p>
+<dl class="attribute">
+<dt>
+<code class="descname">__defaults = values to use as defaults</code></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.bandops.BandMapping.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/bandops.html#BandMapping.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.bandops.BandMapping.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__init__(…) initializes x; see help(type(x)) for signature</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.bandops.BandMapping.allocated_bands">
+<code class="descname">allocated_bands</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/bandops.html#BandMapping.allocated_bands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.bandops.BandMapping.allocated_bands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of bands numbers already allocated to a band type ie not zero.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyprecag.bandops.CalculateIndices">
+<em class="property">class </em><code class="descclassname">pyprecag.bandops.</code><code class="descname">CalculateIndices</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/bandops.html#CalculateIndices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.bandops.CalculateIndices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Functions used for validating and calculating image indices.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>(</strong><strong>)</strong> (<em>**kwargs</em>) – Components of the BandMapping object</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyprecag.bandops.CalculateIndices.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/bandops.html#CalculateIndices.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.bandops.CalculateIndices.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__init__(…) initializes x; see help(type(x)) for signature</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.bandops.CalculateIndices.calculate">
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>index_name</em>, <em>raster</em>, <em>src_nodata=None</em>, <em>dest_nodata=-9999</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/bandops.html#CalculateIndices.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.bandops.CalculateIndices.calculate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Using a given raster, calculate an image index. Valid indices include.</dt>
+<dd>NDVI - Normalised difference vegetation index
+PCD - Plant cell density index
+GNDVI - Green normalised difference vegetation index
+CHLRE - Chlorophyll red-edge index
+NDRE - Normalised difference red-edge index</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>index_name</strong> (<em>str</em>) – The name of the index to calculate options include NDVI, PCD, GNDVI, NDRE and CHLRE</li>
+<li><strong>raster</strong> (<em>str</em>) – The input raster. This can be a filename, rasterio.io.Memoryfile or opened rasterio dataset</li>
+<li><strong>src_nodata</strong> (<em>int</em>) – The nodata value of the image. This will only be used if the input raster has a value of None</li>
+<li><strong>dest_nodata</strong> (<em>int</em>) – The value to use as the output no data value. If np.nan is required use None</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The result of the index calculation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.bandops.CalculateIndices.chlre">
+<code class="descname">chlre</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/bandops.html#CalculateIndices.chlre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.bandops.CalculateIndices.chlre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a Chlorophyll Red-edge index. Requires Red-edge and InfraRed Bands</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.bandops.CalculateIndices.gndvi">
+<code class="descname">gndvi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/bandops.html#CalculateIndices.gndvi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.bandops.CalculateIndices.gndvi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a normalised difference vegetation index. Requires Green and InfraRed Bands</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.bandops.CalculateIndices.ndre">
+<code class="descname">ndre</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/bandops.html#CalculateIndices.ndre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.bandops.CalculateIndices.ndre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a normalised difference red-edge index. Requires Red-edge and InfraRed Bands</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.bandops.CalculateIndices.ndvi">
+<code class="descname">ndvi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/bandops.html#CalculateIndices.ndvi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.bandops.CalculateIndices.ndvi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a normalised difference vegetation index. Requires Red and InfraRed Bands</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.bandops.CalculateIndices.pcd">
+<code class="descname">pcd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/bandops.html#CalculateIndices.pcd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.bandops.CalculateIndices.pcd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a plant cell density index. Requires Red and InfraRed Bands</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.bandops.CalculateIndices.valid_indices">
+<code class="descname">valid_indices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/bandops.html#CalculateIndices.valid_indices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.bandops.CalculateIndices.valid_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a list of indices supported by the band mapping</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pyprecag.config.html" class="btn btn-neutral float-right" title="pyprecag.config" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

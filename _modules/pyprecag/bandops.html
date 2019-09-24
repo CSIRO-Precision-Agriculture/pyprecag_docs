@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.bandops &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyprecag.bandops</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyprecag.bandops</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">ma</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+
+
+<div class="viewcode-block" id="BandMapping"><a class="viewcode-back" href="../../reference/pyprecag.bandops.html#pyprecag.bandops.BandMapping">[docs]</a><span class="k">class</span> <span class="nc">BandMapping</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">MutableMapping</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A dictionary used to manage band types and band numbers.</span>
+
+<span class="sd">    If it has not been set it will have the default value of 0</span>
+
+<span class="sd">    The list of keys is confined to those in __defaults, values must be integers.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        __defaults = values to use as defaults</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;red&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;infrared&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;rededge&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+<div class="viewcode-block" id="BandMapping.__init__"><a class="viewcode-back" href="../../reference/pyprecag.bandops.html#pyprecag.bandops.BandMapping.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">__defaults</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; check if key is from a predefined list and the value is an integer&quot;&quot;&quot;</span>
+        <span class="n">allowed_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__defaults</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_keys</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s1">&#39;BandMapping has no attribute </span><span class="si">{}</span><span class="s1">. Allowed keys are </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__defaults</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{v}</span><span class="s1"> is not an integer&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__defaults</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BandMapping.allocated_bands"><a class="viewcode-back" href="../../reference/pyprecag.bandops.html#pyprecag.bandops.BandMapping.allocated_bands">[docs]</a>    <span class="k">def</span> <span class="nf">allocated_bands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a list of bands numbers already allocated to a band type ie not zero.&quot;&quot;&quot;</span>
+        <span class="n">mapped_bands</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__defaults</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mapped_bands</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="CalculateIndices"><a class="viewcode-back" href="../../reference/pyprecag.bandops.html#pyprecag.bandops.CalculateIndices">[docs]</a><span class="k">class</span> <span class="nc">CalculateIndices</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Functions used for validating and calculating image indices.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        **kwargs (): Components of the BandMapping object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CalculateIndices.__init__"><a class="viewcode-back" href="../../reference/pyprecag.bandops.html#pyprecag.bandops.CalculateIndices.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">band_map</span> <span class="o">=</span> <span class="n">BandMapping</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># store the equation functions in a dictionary, then can retrieve them by a string.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">equation</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NDVI&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndvi</span><span class="p">,</span>
+                         <span class="s1">&#39;PCD&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pcd</span><span class="p">,</span>
+                         <span class="s1">&#39;NDRE&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndre</span><span class="p">,</span>
+                         <span class="s1">&#39;GNDVI&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gndvi</span><span class="p">,</span>
+                         <span class="s1">&#39;CHLRE&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">chlre</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__image</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="CalculateIndices.valid_indices"><a class="viewcode-back" href="../../reference/pyprecag.bandops.html#pyprecag.bandops.CalculateIndices.valid_indices">[docs]</a>    <span class="k">def</span> <span class="nf">valid_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate a list of indices supported by the band mapping&quot;&quot;&quot;</span>
+
+        <span class="n">ind_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># the following will work when a single band integer or a numpy array is loaded against each band.</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ind_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;NDVI&#39;</span><span class="p">)</span>
+            <span class="n">ind_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;PCD&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ind_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;GNDVI&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;rededge&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ind_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;NDRE&#39;</span><span class="p">)</span>
+            <span class="n">ind_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;CHLRE&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ind_list</span></div>
+
+<div class="viewcode-block" id="CalculateIndices.calculate"><a class="viewcode-back" href="../../reference/pyprecag.bandops.html#pyprecag.bandops.CalculateIndices.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_name</span><span class="p">,</span> <span class="n">raster</span><span class="p">,</span> <span class="n">src_nodata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dest_nodata</span><span class="o">=-</span><span class="mi">9999</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Using a given raster, calculate an image index. Valid indices include.</span>
+<span class="sd">            NDVI - Normalised difference vegetation index</span>
+<span class="sd">            PCD - Plant cell density index</span>
+<span class="sd">            GNDVI - Green normalised difference vegetation index</span>
+<span class="sd">            CHLRE - Chlorophyll red-edge index</span>
+<span class="sd">            NDRE - Normalised difference red-edge index</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index_name (str): The name of the index to calculate options include NDVI, PCD, GNDVI, NDRE and CHLRE</span>
+<span class="sd">            raster (str): The input raster. This can be a filename, rasterio.io.Memoryfile or opened rasterio dataset</span>
+<span class="sd">            src_nodata (int): The nodata value of the image. This will only be used if the input raster has a value of None</span>
+<span class="sd">            dest_nodata (int): The value to use as the output no data value. If np.nan is required use None</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: The result of the index calculation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">raster</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Image file required&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">MemoryFile</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">DatasetReader</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">raster</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Image file does not exist&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">src_nodata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src_nodata</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">long</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;src_nodata should be numeric (int, float or long)&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dest_nodata</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dest_nodata</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">long</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;dst_nodata should be numeric (int, float or long)&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__image</span> <span class="o">=</span> <span class="n">raster</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__src_nodata</span> <span class="o">=</span> <span class="n">src_nodata</span>
+
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">equation</span><span class="p">[</span><span class="n">index_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()]()</span>
+
+        <span class="k">if</span> <span class="n">dest_nodata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">result</span><span class="p">)]</span> <span class="o">=</span> <span class="n">dest_nodata</span>
+
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__image</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__src_nodata</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_band_from_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">band_num</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;extract a band from an image an apply masking&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__image</span><span class="p">,</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">DatasetReader</span><span class="p">):</span>
+            <span class="n">raster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__image</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__image</span><span class="p">,</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">MemoryFile</span><span class="p">):</span>
+            <span class="n">raster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__image</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">raster</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__image</span><span class="p">))</span>
+
+        <span class="n">mask_band</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;mask&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">mask_band</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;mask&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">raster</span><span class="o">.</span><span class="n">nodata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">raster</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">mask_band</span><span class="p">,</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">mask</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__src_nodata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_values</span><span class="p">(</span><span class="n">raster</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">mask_band</span><span class="p">,</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__src_nodata</span><span class="p">)</span><span class="o">.</span><span class="n">mask</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">raster</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">raster</span><span class="o">.</span><span class="n">width</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+        <span class="n">band</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">mask</span><span class="p">,</span> <span class="n">raster</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">band_num</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__image</span><span class="p">,</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">DatasetReader</span><span class="p">):</span>
+            <span class="n">raster</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">band</span>
+
+<div class="viewcode-block" id="CalculateIndices.ndvi"><a class="viewcode-back" href="../../reference/pyprecag.bandops.html#pyprecag.bandops.CalculateIndices.ndvi">[docs]</a>    <span class="k">def</span> <span class="nf">ndvi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate a normalised difference vegetation index. Requires Red and InfraRed Bands&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;InfraRed band not specified&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Red band not specified&#39;</span><span class="p">)</span>
+
+        <span class="n">red</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_from_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">])</span>
+        <span class="n">ir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_from_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">ir</span> <span class="o">-</span> <span class="n">red</span><span class="p">,</span> <span class="n">ir</span> <span class="o">+</span> <span class="n">red</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CalculateIndices.gndvi"><a class="viewcode-back" href="../../reference/pyprecag.bandops.html#pyprecag.bandops.CalculateIndices.gndvi">[docs]</a>    <span class="k">def</span> <span class="nf">gndvi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate a normalised difference vegetation index. Requires Green and InfraRed Bands&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Green band not specified&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;InfraRed band not specified&#39;</span><span class="p">)</span>
+
+        <span class="n">green</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_from_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">])</span>
+        <span class="n">ir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_from_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">ir</span> <span class="o">-</span> <span class="n">green</span><span class="p">,</span> <span class="n">ir</span> <span class="o">+</span> <span class="n">green</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CalculateIndices.ndre"><a class="viewcode-back" href="../../reference/pyprecag.bandops.html#pyprecag.bandops.CalculateIndices.ndre">[docs]</a>    <span class="k">def</span> <span class="nf">ndre</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate a normalised difference red-edge index. Requires Red-edge and InfraRed Bands&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;InfraRed band not specified&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;rededge&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Red Edge band not specified&#39;</span><span class="p">)</span>
+
+        <span class="n">re</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_from_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;rededge&#39;</span><span class="p">])</span>
+        <span class="n">ir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_from_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">ir</span> <span class="o">-</span> <span class="n">re</span><span class="p">,</span> <span class="n">ir</span> <span class="o">+</span> <span class="n">re</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CalculateIndices.pcd"><a class="viewcode-back" href="../../reference/pyprecag.bandops.html#pyprecag.bandops.CalculateIndices.pcd">[docs]</a>    <span class="k">def</span> <span class="nf">pcd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate a plant cell density index. Requires Red and InfraRed Bands&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;InfraRed band not specified&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Red band not specified&#39;</span><span class="p">)</span>
+
+        <span class="n">red</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_from_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">])</span>
+        <span class="n">ir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_from_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">ir</span><span class="p">,</span> <span class="n">red</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CalculateIndices.chlre"><a class="viewcode-back" href="../../reference/pyprecag.bandops.html#pyprecag.bandops.CalculateIndices.chlre">[docs]</a>    <span class="k">def</span> <span class="nf">chlre</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate a Chlorophyll Red-edge index. Requires Red-edge and InfraRed Bands&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;InfraRed band not specified&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;rededge&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Red Edge band not specified&#39;</span><span class="p">)</span>
+
+        <span class="n">re</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_from_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;rededge&#39;</span><span class="p">])</span>
+        <span class="n">ir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_from_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_map</span><span class="p">[</span><span class="s1">&#39;infrared&#39;</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">ir</span><span class="p">,</span> <span class="n">re</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

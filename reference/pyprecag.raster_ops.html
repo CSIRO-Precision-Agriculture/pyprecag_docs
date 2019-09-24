@@ -1,0 +1,573 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.raster_ops &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyprecag.table_ops" href="pyprecag.table_ops.html" />
+    <link rel="prev" title="pyprecag.processing" href="pyprecag.processing.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.bandops.html">pyprecag.bandops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.config.html">pyprecag.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.convert.html">pyprecag.convert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.crs.html">pyprecag.crs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.describe.html">pyprecag.describe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.errors.html">pyprecag.errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.kriging_ops.html">pyprecag.kriging_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.processing.html">pyprecag.processing</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pyprecag.raster_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.table_ops.html">pyprecag.table_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.vector_ops.html">pyprecag.vector_ops</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+        
+      <li>pyprecag.raster_ops</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/reference/pyprecag.raster_ops.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pyprecag.raster_ops">
+<span id="pyprecag-raster-ops"></span><h1>pyprecag.raster_ops<a class="headerlink" href="#module-pyprecag.raster_ops" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pyprecag.raster_ops.calculate_image_indices">
+<code class="descclassname">pyprecag.raster_ops.</code><code class="descname">calculate_image_indices</code><span class="sig-paren">(</span><em>image_file</em>, <em>band_map</em>, <em>out_image_file</em>, <em>indices=[]</em>, <em>out_nodata=-9999</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/raster_ops.html#calculate_image_indices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.raster_ops.calculate_image_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a multi-band image where each band represents a calculated index.</p>
+<p>Rasterio’s band tags are used to document which band represents which index.</p>
+<p>The band mapping matches a band number to a band type ie band 3 is the Red band to enable the
+index calculation to occur. It also identifies a band where the nodata value removes the
+non-vine or bare earth signal. This nodata is assigned to the output image.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Indices currently supported are:</dt>
+<dd>NDVI - Normalised difference vegetation index
+PCD - Plant cell density index
+GNDVI - Green normalised difference vegetation index
+CHLRE - Chlorophyll red-edge index
+NDRE - Normalised difference red-edge index</dd>
+</dl>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>image_file</strong> (<em>str</em>) – image_file (str): the input image file</li>
+<li><strong>band_map</strong> (<a class="reference internal" href="pyprecag.bandops.html#pyprecag.bandops.BandMapping" title="pyprecag.bandops.BandMapping"><em>pyprecag.bandops.BandMapping</em></a>) – a Band mapping matching a band number to band type.</li>
+<li><strong>out_image_file</strong> (<em>str</em>) – the name and location of the output image file.</li>
+<li><strong>indices</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – indices (List[str]): The list of indices to calculate.</li>
+<li><strong>out_nodata</strong> (<em>int</em>) – the value to use in the output image for the nodata</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.raster_ops.create_raster_transform">
+<code class="descclassname">pyprecag.raster_ops.</code><code class="descname">create_raster_transform</code><span class="sig-paren">(</span><em>bounds</em>, <em>pixel_size</em>, <em>snap_extent_to_pixel=True</em>, <em>buffer_by_pixels=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/raster_ops.html#create_raster_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.raster_ops.create_raster_transform" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Create parameters required for creating a new raster file based on a known extent and pixel</dt>
+<dd>size.</dd>
+<dt>snap_extent_to_pixel can be used to ensure the bounding coordinates are a divisible of the</dt>
+<dd>pixel size.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>bounds</strong> (<em>float</em><em>, </em><em>float</em><em>, </em><em>float</em><em>, </em><em>float</em>) – the bounding box coordinates (xmin, ymin, xmax, ymax)</li>
+<li><strong>pixel_size</strong> (<em>int</em><em>, </em><em>float</em>) – the required pixel size</li>
+<li><strong>snap_extent_to_pixel</strong> (<em>bool</em>) – round the extent coordinates to be divisible by the pixel size</li>
+<li><strong>buffer_by_pixels</strong> (<em>int</em>) – The number of pixels to buffer the input bounding box by.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the Rasterio Transformation object
+int: the width or number of columns
+int: the height or number of rows.
+[float, float, float, float]: new bounding box coordinates updated if snapping was used.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">affine.Affine</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.raster_ops.focal_statistics">
+<code class="descclassname">pyprecag.raster_ops.</code><code class="descname">focal_statistics</code><span class="sig-paren">(</span><em>raster</em>, <em>band_num=1</em>, <em>ignore_nodata=True</em>, <em>size=3</em>, <em>function=&lt;function nanmean&gt;</em>, <em>clip_to_mask=False</em>, <em>out_colname=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/raster_ops.html#focal_statistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.raster_ops.focal_statistics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derives for each pixel a statistic of the values with the specified neighbourhood.</p>
+<p>Currently the neighbourhood is restricted to square neighbourhoods ie 3x3 size.</p>
+<p>Any numpy statistical functions are supported along with custom functions.</p>
+<p>Nodata values are converted to np.nan and will be excluded from the statistical calculation.
+Nodata pixels may be assigned a value if at least one pixel in the neighbourhood has a valid
+value. To remove/mask these values from the final output, set the clip_to_mask setting to True.</p>
+<p>Using a size of 1 returns the selected band with the converted nodata values. No statistical
+functions are applied.</p>
+<p>An string out_colname is returned and can be used as a filename or column name during future
+analysis. If None, it is derived from the input raster, size and statistical function used.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>For single band inputs   &lt;stat&gt;&lt;size&gt;x&lt;size&gt;_&lt;raster name&gt;</dt>
+<dd>eg.   mean3x3_area1_yield    apply a mean 3x3 filter for raster area1_yield</dd>
+<dt>For multi band inputs   &lt;function&gt;&lt;size&gt;x&lt;size&gt;bd&lt;band_num&gt;_&lt;raster name&gt;</dt>
+<dd>eg.   mean3x3b3_area2       apply a mean 3x3 filter for band 3 of the raster area2</dd>
+</dl>
+</div></blockquote>
+<p>Source: <a class="reference external" href="https://stackoverflow.com/a/30853116/9567306">https://stackoverflow.com/a/30853116/9567306</a>
+<a class="reference external" href="https://stackoverflow.com/questions/46953448/local-mean-filter-of-a-numpy-array-with-missing-data/47052791#47052791">https://stackoverflow.com/questions/46953448/local-mean-filter-of-a-numpy-array-with-missing-data/47052791#47052791</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>raster</strong> (<em>rasterio.io.DatasetReader</em>) – Raster file opened using
+rasterio.open(os.path.normpath())</li>
+<li><strong>band_num</strong> (<em>int</em>) – The band number to apply focal statistics to.</li>
+<li><strong>ignore_nodata</strong> (<em>bool</em>) – If true, the nodata value of the raster will be converted
+to np.nan and excluded from statistical calculations.</li>
+<li><strong>size</strong> (<em>int</em>) – Size of the neighbourhood filter used for statistics calculations.
+Currently restricted to a square neighbourhood ie 3x3, 5x5 etc.</li>
+<li><strong>function</strong> (<em>function</em>) – a functions to apply to the raster. These can include numpy functions
+like np.nanmean or custom ones.</li>
+<li><strong>clip_to_mask</strong> (<em>bool</em>) – If true, remove values assigned to nodata pixels</li>
+<li><strong>out_colname</strong> (<em>str</em>) – An output string used to describe the filter result and can be used
+as a column or filename If NONE, then it will be derived.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A 1D numpy array of double (float32) values
+str:                  a string representation of the inputs</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.raster_ops.nancv">
+<code class="descclassname">pyprecag.raster_ops.</code><code class="descname">nancv</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/raster_ops.html#nancv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.raster_ops.nancv" title="Permalink to this definition">¶</a></dt>
+<dd><p>A function used with scipy.ndimage.generic_filter to calculate the coefficient
+variant of pixels/values excluding nan (nodata) values. It can be used in conjunction with</p>
+<blockquote>
+<div>focal_statistics.</div></blockquote>
+<p>example using a 3x3: generic_filter(band,nancv, mode=’constant’, cval=np.nan, size=3)</p>
+<p>A variation of <a class="reference external" href="https://stackoverflow.com/a/14060024">https://stackoverflow.com/a/14060024</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.raster_ops.normalise">
+<code class="descclassname">pyprecag.raster_ops.</code><code class="descname">normalise</code><span class="sig-paren">(</span><em>raster</em>, <em>band_num=1</em>, <em>ignore_nodata=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/raster_ops.html#normalise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.raster_ops.normalise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalise a single band by adjusting to a mean of zero and standard deviation of 1</p>
+<p>If ignore_nodata is used, then the selected band will be opened as a numpy masked array and
+the specified nodata values will be excluded from calculations</p>
+<dl class="docutils">
+<dt>Returns calculated single band that can be written to file using</dt>
+<dd>rasterio.open(os.path.normpath(),’w’)</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>raster</strong> (<em>rasterio.io.DatasetReader</em>) – Raster file opened by rasterio.open(os.path.normpath())</li>
+<li><strong>band_num</strong> (<em>int</em>) – The band number to apply rescaling too.</li>
+<li><strong>ignore_nodata</strong> (<em>bool</em>) – <p>Ignore nodata values during rescaling.
+If False, nodata pixels and values will be used during the calculation
+If True, band will be read as a masked array and nodata pixels</p>
+<blockquote>
+<div>and values excluded.</div></blockquote>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A single band as a numpy array.
+or
+numpy.ma.core.MaskedArray:    A single band as a numpy array with nodata being stored in</p>
+<blockquote>
+<div><p>the mask</p>
+</div></blockquote>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.raster_ops.pixelcount">
+<code class="descclassname">pyprecag.raster_ops.</code><code class="descname">pixelcount</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/raster_ops.html#pixelcount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.raster_ops.pixelcount" title="Permalink to this definition">¶</a></dt>
+<dd><p>A function used with scipy.ndimage.generic_filter to count the number of real values/pixels
+(ie not nan) when applying a NxN filter.</p>
+<p>A Count of 0 will be replace by np.nan. It can be used in conjunction with focal statistics.
+A variation of <a class="reference external" href="https://stackoverflow.com/a/14060024">https://stackoverflow.com/a/14060024</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.raster_ops.raster_snap_extent">
+<code class="descclassname">pyprecag.raster_ops.</code><code class="descname">raster_snap_extent</code><span class="sig-paren">(</span><em>x_min</em>, <em>y_min</em>, <em>x_max</em>, <em>y_max</em>, <em>pixel_size</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/raster_ops.html#raster_snap_extent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.raster_ops.raster_snap_extent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a new raster extent where bounding coordinates are a divisible of the pixel size.</p>
+<p>The LL will be rounded down, and the UR will be rounded up.</p>
+<blockquote>
+<div><p>Using this function will ensure that rasters have the same pixel origin, when they are created
+which in the long run, will save resampling when multiple raster with the same pixel size
+are compared.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>x_min (float): x_min coordinate will be rounded down to the nearest pixel edge
+y_min (float): y_min coordinate will be rounded down to the nearest pixel edge
+x_max (float): x_max coordinate will be rounded up to the nearest pixel edge
+y_max (float): y_max coordinate will be rounded up to the nearest pixel edge
+pixel_size (float): The pixel size representing the divisor</dd>
+<dt>Returns:</dt>
+<dd>List[float]]: Representing the Bounding box (xmin, ymin, xmax, ymax)</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.raster_ops.reproject_image">
+<code class="descclassname">pyprecag.raster_ops.</code><code class="descname">reproject_image</code><span class="sig-paren">(</span><em>image_file</em>, <em>out_imagefile</em>, <em>out_epsg</em>, <em>band_nums=[]</em>, <em>image_epsg=0</em>, <em>image_nodata=None</em>, <em>resampling=&lt;Resampling.nearest: 0&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/raster_ops.html#reproject_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.raster_ops.reproject_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reproject selected image bands from one coordinate system to another.</p>
+<p>“image_epsg” and “image_nodata” can be used to set the coordinate system and image nodata
+values when they are not already specified within the image file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>image_file</strong> (<em>str</em>) – An input image path and name</li>
+<li><strong>out_imagefile</strong> (<em>str</em>) – An output image path and name</li>
+<li><strong>out_epsg</strong> (<em>int</em>) – The epsg number representing output coordinate system</li>
+<li><strong>band_nums</strong> (<em>List</em>) – The bands to reproject. If list is empty, all bands will be used</li>
+<li><strong>image_epsg</strong> (<em>int</em>) – the epsg number for the image. Only used if not provided by the image.</li>
+<li><strong>image_nodata</strong> (<em>int</em>) – the nodata value for the image. Only used if not provided by the image.</li>
+<li><strong>resampling</strong> (<em>rasterio.enums.Resampling</em>) – The resampling technique to use during reprojection.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.raster_ops.rescale">
+<code class="descclassname">pyprecag.raster_ops.</code><code class="descname">rescale</code><span class="sig-paren">(</span><em>raster</em>, <em>min_value</em>, <em>max_value</em>, <em>band_num=1</em>, <em>ignore_nodata=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/raster_ops.html#rescale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.raster_ops.rescale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescale a single band between a set number of values.</p>
+<p>If ignore_nodata is used, then the selected band will be opened as a numpy masked array
+and the specified nodata values will be excluded</p>
+<p>It returns the calculated single band and can be written to file using
+rasterio.open(os.path.normpath(),’w’)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>raster</strong> (<em>rasterio.io.DatasetReader</em>) – Raster file opened by rasterio.open(os.path.normpath())</li>
+<li><strong>min_value</strong> (<em>int</em>) – The lower/min value to use during rescaling</li>
+<li><strong>max_value</strong> (<em>int</em>) – The Upper/max value to use during rescaling</li>
+<li><strong>band_num</strong> (<em>int</em>) – The band number to apply rescaling too.</li>
+<li><strong>ignore_nodata</strong> (<em>bool</em>) – Ignore nodata values during rescaling.
+If False, the nodata pixels and values will be used during the calculation
+If True, band is read as a masked array and nodata pixels and values excluded</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A single band as a numpy array.
+or
+numpy.ma.core.MaskedArray:  Single band numpy array with nodata being stored in the mask</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.raster_ops.save_in_memory_raster_to_file">
+<code class="descclassname">pyprecag.raster_ops.</code><code class="descname">save_in_memory_raster_to_file</code><span class="sig-paren">(</span><em>memory_raster</em>, <em>out_image</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/raster_ops.html#save_in_memory_raster_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.raster_ops.save_in_memory_raster_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a rasterio memory file as a TIF to disk</p>
+<p>if out_image does not contain a path, it will be save to the Temp Dir.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>memory_raster</strong> (<em>rasterio.io.MemoryFile</em>) – </li>
+<li><strong>out_image</strong> (<em>str</em>) – the tif image name.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the image path and name.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.raster_ops.stack_and_clip_rasters">
+<code class="descclassname">pyprecag.raster_ops.</code><code class="descname">stack_and_clip_rasters</code><span class="sig-paren">(</span><em>raster_files</em>, <em>use_common=True</em>, <em>output_tif=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/raster_ops.html#stack_and_clip_rasters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.raster_ops.stack_and_clip_rasters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine multiple single band files into a single multi band raster where one band represents
+one file. The filename will be saved in the bands tag. Optionally a minimum common area mask
+can be applied.</p>
+<p>All input rasters MUST be of the same coordinate system and pixel size.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>raster_files</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – list of raster files to process</li>
+<li><strong>use_common</strong> (<em>bool</em>) – if true input rasters will be masked to the minimum common data area</li>
+<li><strong>output_tif</strong> (<em>str</em>) – output tif name. if omitted will be created in TEMPDIR</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The output tif file
+list(): A list of the band tags. (ie order of allocation to bands)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str()</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.raster_ops.update_band_statistics_GDAL">
+<code class="descclassname">pyprecag.raster_ops.</code><code class="descname">update_band_statistics_GDAL</code><span class="sig-paren">(</span><em>raster_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/raster_ops.html#update_band_statistics_GDAL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.raster_ops.update_band_statistics_GDAL" title="Permalink to this definition">¶</a></dt>
+<dd><p>update band statistics using GDAL. Not yet built into rasterio</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pyprecag.table_ops.html" class="btn btn-neutral float-right" title="pyprecag.table_ops" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pyprecag.processing.html" class="btn btn-neutral float-left" title="pyprecag.processing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

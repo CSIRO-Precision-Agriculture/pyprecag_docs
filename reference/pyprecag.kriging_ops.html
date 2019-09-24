@@ -1,0 +1,382 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.kriging_ops &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyprecag.processing" href="pyprecag.processing.html" />
+    <link rel="prev" title="pyprecag.errors" href="pyprecag.errors.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.bandops.html">pyprecag.bandops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.config.html">pyprecag.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.convert.html">pyprecag.convert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.crs.html">pyprecag.crs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.describe.html">pyprecag.describe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.errors.html">pyprecag.errors</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pyprecag.kriging_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.processing.html">pyprecag.processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.raster_ops.html">pyprecag.raster_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.table_ops.html">pyprecag.table_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.vector_ops.html">pyprecag.vector_ops</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+        
+      <li>pyprecag.kriging_ops</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/reference/pyprecag.kriging_ops.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pyprecag.kriging_ops">
+<span id="pyprecag-kriging-ops"></span><h1>pyprecag.kriging_ops<a class="headerlink" href="#module-pyprecag.kriging_ops" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pyprecag.kriging_ops.VesperControl">
+<em class="property">class </em><code class="descclassname">pyprecag.kriging_ops.</code><code class="descname">VesperControl</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/kriging_ops.html#VesperControl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.kriging_ops.VesperControl" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary used to manage vesper control keys and values.</p>
+<p>The list of keys is confined to those in __defaults, values are checked against the default
+and must be the same type.</p>
+<dl class="attribute">
+<dt>
+<code class="descname">__defaults = values to use as defaults. Defaults are set for type as well ie 0.00 = float</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">key_order = This doubles as the list of allowed keys and the order required when writing</code></dt>
+<dd><p>to file with the exception of epsg.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.kriging_ops.VesperControl.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/kriging_ops.html#VesperControl.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.kriging_ops.VesperControl.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__init__(…) initializes x; see help(type(x)) for signature</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyprecag.kriging_ops.VesperControl.key_order">
+<code class="descname">key_order</code><em class="property"> = ['ivers', 'title', 'datfil', 'outdir', 'repfil', 'outfil', 'parfil', 'igrids', 'gridfile', 'jigraph', 'jimap', 'numcol', 'icol_x', 'icol_y', 'icol_z', 'valmis', 'jpntkrg', 'xside', 'yside', 'nest', 'dstinc', 'jsetint', 'xlint', 'xhint', 'ylint', 'yhint', 'jsetrad', 'radius', 'minpts', 'maxpts', 'sigsqr', 'lognorm', 'itrend', 'iconvex', 'jlockrg', 'jcomvar', 'nlag', 'tolag', 'hmax', 'iwei', 'modtyp', 'CO', 'C1', 'A1', 'C2', 'A2', 'Alfa', 'jordkrg', 'isomod', 'isearch', 'igeos', 'icircs', 'phi', 'psin', 'pcos']</em><a class="headerlink" href="#pyprecag.kriging_ops.VesperControl.key_order" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.kriging_ops.VesperControl.updated_keys">
+<code class="descname">updated_keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/kriging_ops.html#VesperControl.updated_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.kriging_ops.VesperControl.updated_keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyprecag.kriging_ops.VesperControl.write_to_file">
+<code class="descname">write_to_file</code><span class="sig-paren">(</span><em>output_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/kriging_ops.html#VesperControl.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.kriging_ops.VesperControl.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.kriging_ops.prepare_for_vesper_krige">
+<code class="descclassname">pyprecag.kriging_ops.</code><code class="descname">prepare_for_vesper_krige</code><span class="sig-paren">(</span><em>in_dataframe</em>, <em>krig_column</em>, <em>grid_filename</em>, <em>out_folder</em>, <em>control_textfile=''</em>, <em>coord_columns=[]</em>, <em>epsg=0</em>, <em>display_graphics=False</em>, <em>control_options={'A1': 10.0</em>, <em>'A2': 1.0</em>, <em>'Alfa': 1.0</em>, <em>'C1': 1.0</em>, <em>'C2': 1.0</em>, <em>'CO': 0.0</em>, <em>'datfil': 'vesperdata.csv'</em>, <em>'dstinc': 1</em>, <em>'epsg': 0</em>, <em>'gridfile': 'vespergrid.txt'</em>, <em>'hmax': 0</em>, <em>'icircs': 0</em>, <em>'icol_x': 1</em>, <em>'icol_y': 2</em>, <em>'icol_z': 3</em>, <em>'iconvex': 0</em>, <em>'igeos': 0</em>, <em>'igrids': 1</em>, <em>'isearch': 0</em>, <em>'isomod': 1</em>, <em>'itrend': 0</em>, <em>'ivers': 16121</em>, <em>'iwei': 1</em>, <em>'jcomvar': 1</em>, <em>'jigraph': 0</em>, <em>'jimap': 0</em>, <em>'jlockrg': 1</em>, <em>'jordkrg': 1</em>, <em>'jpntkrg': 0</em>, <em>'jsetint': 0</em>, <em>'jsetrad': 0</em>, <em>'lognorm': 0</em>, <em>'maxpts': 100</em>, <em>'minpts': 90</em>, <em>'modtyp': 2</em>, <em>'nest': 10</em>, <em>'nlag': 20</em>, <em>'numcol': 4</em>, <em>'outdir': ''</em>, <em>'outfil': 'kriged.txt'</em>, <em>'parfil': 'parameter.txt'</em>, <em>'pcos': 0</em>, <em>'phi': 0</em>, <em>'psin': 0</em>, <em>'radius': 100</em>, <em>'repfil': 'report.txt'</em>, <em>'sigsqr': 0</em>, <em>'title': 'kriging of control.txt configured by pyprecag epsg='</em>, <em>'tolag': 10</em>, <em>'valmis': -9999</em>, <em>'xhint': 0</em>, <em>'xlint': 0</em>, <em>'xside': 10</em>, <em>'yhint': 0</em>, <em>'ylint': 0</em>, <em>'yside': 10}</em>, <em>block_size=10</em>, <em>vesper_exe='C:\\Program Files (x86)\\Vesper\\Vesper1.6.exe'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/kriging_ops.html#prepare_for_vesper_krige"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.kriging_ops.prepare_for_vesper_krige" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare data for vesper kriging and create a windows batch file to run outside the
+python/pyprecag environment.</p>
+<p>The input arguments will be used to update the control_options.</p>
+<p>A description of the keys and their options can be found in the VESPER user manual at
+<a class="reference external" href="https://sydney.edu.au/agriculture/pal/documents/Vesper_1.6_User_Manual.pdf">https://sydney.edu.au/agriculture/pal/documents/Vesper_1.6_User_Manual.pdf</a></p>
+<p>block_size will be replaced by the xside and yside keys in the VesperControl Object.</p>
+<dl class="docutils">
+<dt>Outputs:  The following files will be added to the vesper sub-folder in the output folder.</dt>
+<dd><p class="first"><em>_control_</em>.txt  - The vesper control file
+<em>_vesperdata_</em>.csv - The subset of data to krige. All non-required columns are deleted.
+Do_Vesper.bat - A windows batch file to launch vesper kriging for all control files</p>
+<p class="last">Any files matching the derived kriged output names will be deleted to ensure that the
+files in the folder belong to the newly create control file. If old version are to
+be kept, manually rename first.</p>
+</dd>
+</dl>
+<p>DEPENDANCY: Vesper must already be installed on the PC and the install directory added
+to the config.json file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>in_dataframe</strong> (<em>geopandas.geodataframe.GeoDataFrame</em><em>, </em><em>pandas.core.frame.DataFrame</em>) – </li>
+<li><strong>krig_column</strong> (<em>str</em>) – The column containing the data to krige.</li>
+<li><strong>grid_filename</strong> (<em>str</em>) – The vesper grid file.</li>
+<li><strong>control_textfile</strong> (<em>str</em>) – The name of the control text file without the path</li>
+<li><strong>out_folder</strong> (<em>str</em>) – The folder to add outputs too. A ‘Vesper’ sub directory will be created</li>
+<li><strong>block_size</strong> (<em>int</em>) – The size to apply for block Kriging. Units are from the coordinate system.</li>
+<li><strong>coord_columns</strong> (<em>List</em>) – The columns representing the X and Y coordinates.</li>
+<li><strong>epsg</strong> (<em>int</em>) – The epsg_number number for the data. If 0 the en_epsg or
+enepsg column (if exists) will be used.</li>
+<li><strong>display_graphics</strong> (<em>bool</em>) – Option to display graphics while running vesper kriging.</li>
+<li><strong>vesper_exe</strong> (<em>str</em>) – The path for the location of the Vesper executable</li>
+<li><strong>control_options</strong> (<a class="reference internal" href="#pyprecag.kriging_ops.VesperControl" title="pyprecag.kriging_ops.VesperControl"><em>pyprecag.kriging_ops.VesperControl</em></a>) – Vesper control settings parameters</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The paths to the generated batch file and control file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">vesper_batfile, vesper_ctrlfile</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.kriging_ops.run_vesper">
+<code class="descclassname">pyprecag.kriging_ops.</code><code class="descname">run_vesper</code><span class="sig-paren">(</span><em>ctrl_file</em>, <em>bMinimiseWindow=True</em>, <em>vesper_exe='C:\\Program Files (x86)\\Vesper\\Vesper1.6.exe'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/kriging_ops.html#run_vesper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.kriging_ops.run_vesper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run VESPER for selected control file.</p>
+<p>By default the current working directory will be set to the folder containing the control file.</p>
+<p>By default processing will wait for the current VESPER control file to complete.
+:param ctrl_file: the control file to run as VESPER argument.
+:type ctrl_file: str
+:param bMinimiseWindow: Option to automatically minimise the VESPER window on launch.
+:type bMinimiseWindow: bool
+:param vesper_exe: The path for the location of the Vesper executable
+:type vesper_exe: str</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.kriging_ops.test_for_windows">
+<code class="descclassname">pyprecag.kriging_ops.</code><code class="descname">test_for_windows</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/kriging_ops.html#test_for_windows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.kriging_ops.test_for_windows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.kriging_ops.vesper_text_to_raster">
+<code class="descclassname">pyprecag.kriging_ops.</code><code class="descname">vesper_text_to_raster</code><span class="sig-paren">(</span><em>control_textfile</em>, <em>krig_epsg=0</em>, <em>nodata_value=-9999</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/kriging_ops.html#vesper_text_to_raster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.kriging_ops.vesper_text_to_raster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an vesper kriged text file output to a prediction and a standard error (SE) tif
+raster, and create a confidence interval (CI) metadata file. If the output files already
+exists, they will be overwritten.</p>
+<dl class="docutils">
+<dt>Kriging using Vesper creates 3 new files:</dt>
+<dd><blockquote class="first">
+<div><em>_kriged_</em>.txt, <em>_report_</em>.txt, <em>_parameter_</em>.txt.</div></blockquote>
+<p class="last">There is a 100 character file path limitation set within vesper for the kriged and
+report files. By using the control filename as the input, the truncated files can be renamed
+to their correct names and is used as a base for derived tiff and metadata</p>
+</dd>
+</dl>
+<p>The <em>_kriged_</em>.txt file contains the data to create the desired outputs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>control_textfile</strong> (<em>str</em>) – The control file for the associated vesper krige raster
+(see note above) to convert.</li>
+<li><strong>krig_epsg</strong> (<em>int</em>) – The EPSG number to assign to the output raster</li>
+<li><strong>nodata_value</strong> (<em>int</em>) – The value to assign to nodata pixels.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Outputs:</dt>
+<dd><em>_CI_</em>.txt      The confidence interval (CI) metadata file.
+<em>_PRED_</em>.tif    The kriged column prediction tif
+<em>_SE_</em>.tif      The kriged column standard error (SE) tif</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pyprecag.processing.html" class="btn btn-neutral float-right" title="pyprecag.processing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pyprecag.errors.html" class="btn btn-neutral float-left" title="pyprecag.errors" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

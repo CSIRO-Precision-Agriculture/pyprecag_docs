@@ -1,0 +1,891 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.raster_ops &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyprecag.raster_ops</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyprecag.raster_ops</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="k">import</span> <span class="n">NamedTemporaryFile</span>
+
+<span class="kn">from</span> <span class="nn">osgeo</span> <span class="k">import</span> <span class="n">gdal</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">from</span> <span class="nn">rasterio.enums</span> <span class="k">import</span> <span class="n">Resampling</span>
+<span class="kn">from</span> <span class="nn">rasterio</span> <span class="k">import</span> <span class="n">shutil</span> <span class="k">as</span> <span class="n">rio_shutil</span>
+<span class="kn">from</span> <span class="nn">rasterio.warp</span> <span class="k">import</span> <span class="n">calculate_default_transform</span><span class="p">,</span> <span class="n">reproject</span>
+<span class="kn">from</span> <span class="nn">rasterio.windows</span> <span class="k">import</span> <span class="n">get_data_window</span><span class="p">,</span> <span class="n">from_bounds</span><span class="p">,</span> <span class="n">intersection</span>
+
+<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="k">import</span> <span class="n">generic_filter</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">crs</span> <span class="k">as</span> <span class="n">pyprecag_crs</span>
+<span class="kn">from</span> <span class="nn">.bandops</span> <span class="k">import</span> <span class="n">CalculateIndices</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">TEMPDIR</span>
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">LOGGER</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="create_raster_transform"><a class="viewcode-back" href="../../reference/pyprecag.raster_ops.html#pyprecag.raster_ops.create_raster_transform">[docs]</a><span class="k">def</span> <span class="nf">create_raster_transform</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="n">snap_extent_to_pixel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">buffer_by_pixels</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create parameters required for creating a new raster file based on a known extent and pixel</span>
+<span class="sd">     size.</span>
+
+<span class="sd">    snap_extent_to_pixel can be used to ensure the bounding coordinates are a divisible of the</span>
+<span class="sd">     pixel size.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bounds (float, float, float, float): the bounding box coordinates (xmin, ymin, xmax, ymax)</span>
+<span class="sd">        pixel_size (int, float): the required pixel size</span>
+<span class="sd">        snap_extent_to_pixel (bool): round the extent coordinates to be divisible by the pixel size</span>
+<span class="sd">        buffer_by_pixels (int): The number of pixels to buffer the input bounding box by.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        affine.Affine: the Rasterio Transformation object</span>
+<span class="sd">        int: the width or number of columns</span>
+<span class="sd">        int: the height or number of rows.</span>
+<span class="sd">        [float, float, float, float]: new bounding box coordinates updated if snapping was used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Bounds should be a tuple or list for xmin, ymin, xmax, ymax&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pixel_size</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;pixel_size must be numeric number.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">snap_extent_to_pixel</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;snap_extent_to_pixel must be boolean.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># adjust values to an area slightly larger than the bounds</span>
+    <span class="k">if</span> <span class="n">buffer_by_pixels</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">pixel_size</span> <span class="o">*</span> <span class="n">buffer_by_pixels</span><span class="p">),</span>
+                  <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">pixel_size</span> <span class="o">*</span> <span class="n">buffer_by_pixels</span><span class="p">),</span>
+                  <span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">pixel_size</span> <span class="o">*</span> <span class="n">buffer_by_pixels</span><span class="p">),</span>
+                  <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">pixel_size</span> <span class="o">*</span> <span class="n">buffer_by_pixels</span><span class="p">))</span>
+
+    <span class="c1"># We may want to snap the output grids to a multiple of the grid size, allowing</span>
+    <span class="c1"># adjacent blocks to align nicely.</span>
+    <span class="k">if</span> <span class="n">snap_extent_to_pixel</span><span class="p">:</span>
+        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">raster_snap_extent</span><span class="p">(</span><span class="o">*</span><span class="n">bounds</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixel_size</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">bounds</span>
+
+    <span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_size</span><span class="p">)</span>  <span class="c1"># columns</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_size</span><span class="p">)</span>  <span class="c1"># rows</span>
+
+    <span class="c1"># create an affine transformation matrix to associate the array to the coordinates.</span>
+    <span class="kn">from</span> <span class="nn">rasterio.transform</span> <span class="k">import</span> <span class="n">from_origin</span>
+    <span class="n">transform</span> <span class="o">=</span> <span class="n">from_origin</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">transform</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="raster_snap_extent"><a class="viewcode-back" href="../../reference/pyprecag.raster_ops.html#pyprecag.raster_ops.raster_snap_extent">[docs]</a><span class="k">def</span> <span class="nf">raster_snap_extent</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate a new raster extent where bounding coordinates are a divisible of the pixel size.</span>
+
+<span class="sd">   The LL will be rounded down, and the UR will be rounded up.</span>
+
+<span class="sd">    Using this function will ensure that rasters have the same pixel origin, when they are created</span>
+<span class="sd">    which in the long run, will save resampling when multiple raster with the same pixel size</span>
+<span class="sd">    are compared.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x_min (float): x_min coordinate will be rounded down to the nearest pixel edge</span>
+<span class="sd">        y_min (float): y_min coordinate will be rounded down to the nearest pixel edge</span>
+<span class="sd">        x_max (float): x_max coordinate will be rounded up to the nearest pixel edge</span>
+<span class="sd">        y_max (float): y_max coordinate will be rounded up to the nearest pixel edge</span>
+<span class="sd">        pixel_size (float): The pixel size representing the divisor</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[float]]: Representing the Bounding box (xmin, ymin, xmax, ymax)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">argCheck</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;x_min&#39;</span><span class="p">,</span> <span class="n">x_min</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;y_min&#39;</span><span class="p">,</span> <span class="n">y_min</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;x_max&#39;</span><span class="p">,</span> <span class="n">x_max</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;y_max&#39;</span><span class="p">,</span> <span class="n">y_max</span><span class="p">),</span>
+                     <span class="p">(</span><span class="s1">&#39;pixel_size&#39;</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">)]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> must be a floating number.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="n">b_box</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_min</span> <span class="o">-</span> <span class="p">(</span><span class="n">x_min</span> <span class="o">%</span> <span class="n">pixel_size</span><span class="p">),</span>  <span class="c1"># calc new xMin</span>
+             <span class="n">y_min</span> <span class="o">-</span> <span class="p">(</span><span class="n">y_min</span> <span class="o">%</span> <span class="n">pixel_size</span><span class="p">),</span>  <span class="c1"># calc new yMin</span>
+             <span class="p">(</span><span class="n">x_max</span> <span class="o">+</span> <span class="n">pixel_size</span><span class="p">)</span> <span class="o">-</span> <span class="p">((</span><span class="n">x_max</span> <span class="o">+</span> <span class="n">pixel_size</span><span class="p">)</span> <span class="o">%</span> <span class="n">pixel_size</span><span class="p">),</span>  <span class="c1"># calc new xMax</span>
+             <span class="p">(</span><span class="n">y_max</span> <span class="o">+</span> <span class="n">pixel_size</span><span class="p">)</span> <span class="o">-</span> <span class="p">((</span><span class="n">y_max</span> <span class="o">+</span> <span class="n">pixel_size</span><span class="p">)</span> <span class="o">%</span> <span class="n">pixel_size</span><span class="p">)]</span>  <span class="c1"># calc new yMax</span>
+
+    <span class="k">return</span> <span class="n">b_box</span></div>
+
+
+<div class="viewcode-block" id="rescale"><a class="viewcode-back" href="../../reference/pyprecag.raster_ops.html#pyprecag.raster_ops.rescale">[docs]</a><span class="k">def</span> <span class="nf">rescale</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="p">,</span> <span class="n">band_num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ignore_nodata</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Rescale a single band between a set number of values.</span>
+
+<span class="sd">    If ignore_nodata is used, then the selected band will be opened as a numpy masked array</span>
+<span class="sd">    and the specified nodata values will be excluded</span>
+
+<span class="sd">    It returns the calculated single band and can be written to file using</span>
+<span class="sd">    rasterio.open(os.path.normpath(),&#39;w&#39;)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        raster (rasterio.io.DatasetReader): Raster file opened by rasterio.open(os.path.normpath())</span>
+<span class="sd">        min_value (int): The lower/min value to use during rescaling</span>
+<span class="sd">        max_value (int): The Upper/max value to use during rescaling</span>
+<span class="sd">        band_num (int): The band number to apply rescaling too.</span>
+<span class="sd">        ignore_nodata (bool): Ignore nodata values during rescaling.</span>
+<span class="sd">                    If False, the nodata pixels and values will be used during the calculation</span>
+<span class="sd">                    If True, band is read as a masked array and nodata pixels and values excluded</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: A single band as a numpy array.</span>
+<span class="sd">        or</span>
+<span class="sd">        numpy.ma.core.MaskedArray:  Single band numpy array with nodata being stored in the mask</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">DatasetReader</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input should be a rasterio.DatasetReader created using &quot;</span>
+                        <span class="s2">&quot;rasterio.open(os.path.normpath())&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">argCheck</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;min_value&#39;</span><span class="p">,</span> <span class="n">min_value</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;max_value&#39;</span><span class="p">,</span> <span class="n">max_value</span><span class="p">)]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> must be numeric.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">argCheck</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="n">band</span> <span class="o">=</span> <span class="n">raster</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">band_num</span><span class="p">,</span> <span class="n">masked</span><span class="o">=</span><span class="n">ignore_nodata</span><span class="p">)</span>
+
+    <span class="c1"># formula: https://gis.stackexchange.com/a/28563</span>
+    <span class="c1"># use np.nanXXX to create consistent results.</span>
+    <span class="n">band</span> <span class="o">=</span> <span class="n">band</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="n">rescaled</span> <span class="o">=</span> <span class="p">((</span><span class="n">band</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">band</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_value</span> <span class="o">-</span> <span class="n">min_value</span><span class="p">)</span>
+                <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">band</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">band</span><span class="p">))</span> <span class="o">+</span> <span class="n">min_value</span><span class="p">)</span>
+
+    <span class="c1"># pick and assign the most appropriate dtype for the result</span>
+    <span class="n">rescaled</span> <span class="o">=</span> <span class="n">rescaled</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">rasterio</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">get_minimum_dtype</span><span class="p">(</span><span class="n">rescaled</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">rescaled</span></div>
+
+
+<div class="viewcode-block" id="normalise"><a class="viewcode-back" href="../../reference/pyprecag.raster_ops.html#pyprecag.raster_ops.normalise">[docs]</a><span class="k">def</span> <span class="nf">normalise</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">band_num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ignore_nodata</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Normalise a single band by adjusting to a mean of zero and standard deviation of 1</span>
+
+<span class="sd">    If ignore_nodata is used, then the selected band will be opened as a numpy masked array and</span>
+<span class="sd">    the specified nodata values will be excluded from calculations</span>
+
+<span class="sd">    Returns calculated single band that can be written to file using</span>
+<span class="sd">     rasterio.open(os.path.normpath(),&#39;w&#39;)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        raster (rasterio.io.DatasetReader): Raster file opened by rasterio.open(os.path.normpath())</span>
+<span class="sd">        band_num (int):       The band number to apply rescaling too.</span>
+<span class="sd">        ignore_nodata (bool): Ignore nodata values during rescaling.</span>
+<span class="sd">                              If False, nodata pixels and values will be used during the calculation</span>
+<span class="sd">                              If True, band will be read as a masked array and nodata pixels</span>
+<span class="sd">                                  and values excluded.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: A single band as a numpy array.</span>
+<span class="sd">        or</span>
+<span class="sd">        numpy.ma.core.MaskedArray:    A single band as a numpy array with nodata being stored in</span>
+<span class="sd">                                   the mask</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">DatasetReader</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input should be a rasterio.DatasetReader created using &quot;</span>
+                        <span class="s2">&quot;rasterio.open(os.path.normpath())&quot;</span><span class="p">)</span>
+
+    <span class="n">band</span> <span class="o">=</span> <span class="n">raster</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">band_num</span><span class="p">,</span> <span class="n">masked</span><span class="o">=</span><span class="n">ignore_nodata</span><span class="p">)</span>
+
+    <span class="c1"># convert to float64 for accuracy</span>
+    <span class="n">band</span> <span class="o">=</span> <span class="n">band</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="n">normalised</span> <span class="o">=</span> <span class="p">(</span><span class="n">band</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">band</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">band</span><span class="p">)</span>
+
+    <span class="n">normalised</span> <span class="o">=</span> <span class="n">normalised</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">rasterio</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">get_minimum_dtype</span><span class="p">(</span><span class="n">normalised</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">normalised</span></div>
+
+
+<div class="viewcode-block" id="nancv"><a class="viewcode-back" href="../../reference/pyprecag.raster_ops.html#pyprecag.raster_ops.nancv">[docs]</a><span class="k">def</span> <span class="nf">nancv</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A function used with scipy.ndimage.generic_filter to calculate the coefficient</span>
+<span class="sd">    variant of pixels/values excluding nan (nodata) values. It can be used in conjunction with</span>
+<span class="sd">     focal_statistics.</span>
+
+<span class="sd">    example using a 3x3: generic_filter(band,nancv, mode=&#39;constant&#39;, cval=np.nan, size=3)</span>
+
+<span class="sd">    A variation of https://stackoverflow.com/a/14060024</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">x</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="pixelcount"><a class="viewcode-back" href="../../reference/pyprecag.raster_ops.html#pyprecag.raster_ops.pixelcount">[docs]</a><span class="k">def</span> <span class="nf">pixelcount</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A function used with scipy.ndimage.generic_filter to count the number of real values/pixels</span>
+<span class="sd">        (ie not nan) when applying a NxN filter.</span>
+
+<span class="sd">        A Count of 0 will be replace by np.nan. It can be used in conjunction with focal statistics.</span>
+<span class="sd">        A variation of https://stackoverflow.com/a/14060024&quot;&quot;&quot;</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">val</span></div>
+
+
+<div class="viewcode-block" id="focal_statistics"><a class="viewcode-back" href="../../reference/pyprecag.raster_ops.html#pyprecag.raster_ops.focal_statistics">[docs]</a><span class="k">def</span> <span class="nf">focal_statistics</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">band_num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ignore_nodata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">,</span>
+                     <span class="n">clip_to_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">out_colname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Derives for each pixel a statistic of the values with the specified neighbourhood.</span>
+
+<span class="sd">    Currently the neighbourhood is restricted to square neighbourhoods ie 3x3 size.</span>
+
+<span class="sd">    Any numpy statistical functions are supported along with custom functions.</span>
+
+<span class="sd">    Nodata values are converted to np.nan and will be excluded from the statistical calculation.</span>
+<span class="sd">    Nodata pixels may be assigned a value if at least one pixel in the neighbourhood has a valid</span>
+<span class="sd">    value. To remove/mask these values from the final output, set the clip_to_mask setting to True.</span>
+
+<span class="sd">    Using a size of 1 returns the selected band with the converted nodata values. No statistical</span>
+<span class="sd">    functions are applied.</span>
+
+<span class="sd">    An string out_colname is returned and can be used as a filename or column name during future</span>
+<span class="sd">    analysis. If None, it is derived from the input raster, size and statistical function used.</span>
+<span class="sd">          For single band inputs   &lt;stat&gt;&lt;size&gt;x&lt;size&gt;_&lt;raster name&gt;</span>
+<span class="sd">             eg.   mean3x3_area1_yield    apply a mean 3x3 filter for raster area1_yield</span>
+
+<span class="sd">          For multi band inputs   &lt;function&gt;&lt;size&gt;x&lt;size&gt;bd&lt;band_num&gt;_&lt;raster name&gt;</span>
+<span class="sd">             eg.   mean3x3b3_area2       apply a mean 3x3 filter for band 3 of the raster area2</span>
+
+<span class="sd">    Source: https://stackoverflow.com/a/30853116/9567306</span>
+<span class="sd">    https://stackoverflow.com/questions/46953448/local-mean-filter-of-a-numpy-array-with-missing-data/47052791#47052791</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        raster (rasterio.io.DatasetReader): Raster file opened using</span>
+<span class="sd">                                 rasterio.open(os.path.normpath())</span>
+<span class="sd">        band_num (int):       The band number to apply focal statistics to.</span>
+<span class="sd">        ignore_nodata (bool): If true, the nodata value of the raster will be converted</span>
+<span class="sd">                              to np.nan and excluded from statistical calculations.</span>
+<span class="sd">        size (int):           Size of the neighbourhood filter used for statistics calculations.</span>
+<span class="sd">                              Currently restricted to a square neighbourhood ie 3x3, 5x5 etc.</span>
+<span class="sd">        function (function):  a functions to apply to the raster. These can include numpy functions</span>
+<span class="sd">                              like np.nanmean or custom ones.</span>
+<span class="sd">        clip_to_mask (bool):  If true, remove values assigned to nodata pixels</span>
+<span class="sd">        out_colname (str):    An output string used to describe the filter result and can be used</span>
+<span class="sd">                              as a column or filename If NONE, then it will be derived.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray:        A 1D numpy array of double (float32) values</span>
+<span class="sd">        str:                  a string representation of the inputs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">DatasetReader</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input should be a rasterio.DatasetReader created using rasterio.open()&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Size should be an odd number integer greater than one. Only &quot;</span>
+                        <span class="s2">&quot;Square Filters are supported.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ignore_nodata</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> should be a boolean.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ignore_nodata</span><span class="p">))</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">col_name</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">raster</span><span class="o">.</span><span class="n">read_masks</span><span class="p">(</span><span class="n">band_num</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ignore_nodata</span><span class="p">:</span>
+        <span class="c1"># change nodata values to np.nan</span>
+        <span class="n">band</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">raster</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">band_num</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">band</span> <span class="o">=</span> <span class="n">raster</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">band_num</span><span class="p">)</span>
+
+    <span class="c1"># convert to float64 for accuracy</span>
+    <span class="n">band</span> <span class="o">=</span> <span class="n">band</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="n">generic_filter</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">cval</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+
+        <span class="n">col_name</span> <span class="o">+=</span> <span class="p">[</span><span class="n">function</span><span class="o">.</span><span class="n">func_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">x</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">size</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">band</span>
+        <span class="n">col_name</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;pixel&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">raster</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># the number of bands in the raster</span>
+        <span class="n">col_name</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;bd</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">band_num</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="n">clip_to_mask</span><span class="p">:</span>
+        <span class="c1"># reapply the mask to remove values assigned to nodata pixels</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">filtered</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+    <span class="n">title</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">raster</span><span class="o">.</span><span class="n">name</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">out_colname</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">out_colname</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">out_colname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">col_name</span><span class="p">),</span> <span class="n">title</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get_debug_mode</span><span class="p">():</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:50}</span><span class="s1">  </span><span class="si">{dur:17}</span><span class="s1"> min: </span><span class="si">{:&gt;.4f}</span><span class="s1"> max: </span><span class="si">{:&gt;.4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">out_colname</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">filtered</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">filtered</span><span class="p">),</span>
+            <span class="n">dur</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">filtered</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">out_colname</span></div>
+
+
+<div class="viewcode-block" id="calculate_image_indices"><a class="viewcode-back" href="../../reference/pyprecag.raster_ops.html#pyprecag.raster_ops.calculate_image_indices">[docs]</a><span class="k">def</span> <span class="nf">calculate_image_indices</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="n">band_map</span><span class="p">,</span> <span class="n">out_image_file</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[],</span> <span class="n">out_nodata</span><span class="o">=-</span><span class="mi">9999</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a multi-band image where each band represents a calculated index.</span>
+
+<span class="sd">    Rasterio&#39;s band tags are used to document which band represents which index.</span>
+
+<span class="sd">    The band mapping matches a band number to a band type ie band 3 is the Red band to enable the</span>
+<span class="sd">    index calculation to occur. It also identifies a band where the nodata value removes the</span>
+<span class="sd">    non-vine or bare earth signal. This nodata is assigned to the output image.</span>
+
+<span class="sd">     Indices currently supported are:</span>
+<span class="sd">        NDVI - Normalised difference vegetation index</span>
+<span class="sd">        PCD - Plant cell density index</span>
+<span class="sd">        GNDVI - Green normalised difference vegetation index</span>
+<span class="sd">        CHLRE - Chlorophyll red-edge index</span>
+<span class="sd">        NDRE - Normalised difference red-edge index</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image_file (str): image_file (str): the input image file</span>
+<span class="sd">        band_map (pyprecag.bandops.BandMapping): a Band mapping matching a band number to band type.</span>
+<span class="sd">        out_image_file (str): the name and location of the output image file.</span>
+<span class="sd">        indices (List[str]): indices (List[str]): The list of indices to calculate.</span>
+<span class="sd">        out_nodata (int): the value to use in the output image for the nodata</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;indices must be a list of indices to calculate&#39;</span><span class="p">)</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;GTiff&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                 <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">),</span>
+                 <span class="s1">&#39;nodata&#39;</span><span class="p">:</span> <span class="n">out_nodata</span><span class="p">})</span>
+
+    <span class="n">ci</span> <span class="o">=</span> <span class="n">CalculateIndices</span><span class="p">(</span><span class="o">**</span><span class="n">band_map</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">out_image_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="s2">&quot;NONE&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">)</span> <span class="k">as</span> <span class="n">dest</span><span class="p">:</span>
+        <span class="c1"># Calculate each index and write them as a separate band.</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">eaIndex</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">index_arr</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">eaIndex</span><span class="p">,</span> <span class="n">image_file</span><span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">index_arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">rasterio</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">update_tags</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">eaIndex</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">index_arr</span>
+
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="s1"> </span><span class="si">{:&gt;10}</span><span class="s1">   </span><span class="si">{:&lt;15}</span><span class="s1"> </span><span class="si">{dur}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Indices Calculate for Image&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">indices</span><span class="p">),</span>
+                                              <span class="n">dur</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="reproject_image"><a class="viewcode-back" href="../../reference/pyprecag.raster_ops.html#pyprecag.raster_ops.reproject_image">[docs]</a><span class="k">def</span> <span class="nf">reproject_image</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="n">out_imagefile</span><span class="p">,</span> <span class="n">out_epsg</span><span class="p">,</span> <span class="n">band_nums</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">image_epsg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">image_nodata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resampling</span><span class="o">=</span><span class="n">Resampling</span><span class="o">.</span><span class="n">nearest</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reproject selected image bands from one coordinate system to another.</span>
+
+<span class="sd">    &quot;image_epsg&quot; and &quot;image_nodata&quot; can be used to set the coordinate system and image nodata</span>
+<span class="sd">    values when they are not already specified within the image file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image_file (str): An input image path and name</span>
+<span class="sd">        out_imagefile (str): An output image path and name</span>
+<span class="sd">        out_epsg (int): The epsg number representing output coordinate system</span>
+<span class="sd">        band_nums (List): The bands to reproject. If list is empty, all bands will be used</span>
+<span class="sd">        image_epsg (int): the epsg number for the image. Only used if not provided by the image.</span>
+<span class="sd">        image_nodata (int): the nodata value for the image. Only used if not provided by the image.</span>
+<span class="sd">        resampling (rasterio.enums.Resampling): The resampling technique to use during reprojection.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">out_epsg</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">dst_crs</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">CRS</span><span class="o">.</span><span class="n">from_epsg</span><span class="p">(</span><span class="n">out_epsg</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">image_file</span><span class="p">))</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;GTiff&#39;</span><span class="p">})</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">band_nums</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">band_nums</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">band_nums</span><span class="p">)})</span>
+
+        <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">image_epsg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">image_epsg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input coordinate system required - image_file does not &#39;</span>
+                                 <span class="s1">&#39;contain a coordinate system, and in_epsg is 0&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">src_crs</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">CRS</span><span class="o">.</span><span class="n">from_epsg</span><span class="p">(</span><span class="n">image_epsg</span><span class="p">)</span>
+                <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;crs&#39;</span><span class="p">:</span> <span class="n">src_crs</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">image_epsg</span> <span class="o">=</span> <span class="n">pyprecag_crs</span><span class="o">.</span><span class="n">getCRSfromRasterFile</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span><span class="o">.</span><span class="n">epsg_number</span>
+            <span class="n">src_crs</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">crs</span>
+
+        <span class="k">if</span> <span class="n">image_nodata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">image_nodata</span> <span class="o">!=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;nodata&#39;</span><span class="p">]:</span>
+            <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;nodata&#39;</span><span class="p">:</span> <span class="n">image_nodata</span><span class="p">})</span>
+
+        <span class="c1"># create a raster in memory by copying input data or reprojecting ------------------------</span>
+        <span class="k">if</span> <span class="n">out_epsg</span> <span class="o">==</span> <span class="n">image_epsg</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">out_imagefile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">)</span> <span class="k">as</span> <span class="n">dest</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ea_band</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">band_nums</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">ea_band</span><span class="p">),</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="n">dest</span><span class="o">.</span><span class="n">update_tags</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="o">**</span><span class="n">src</span><span class="o">.</span><span class="n">tags</span><span class="p">(</span><span class="n">ea_band</span><span class="p">))</span>
+
+                <span class="n">dest</span><span class="o">.</span><span class="n">update_tags</span><span class="p">(</span><span class="o">**</span><span class="n">src</span><span class="o">.</span><span class="n">tags</span><span class="p">())</span>
+
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="s1"> </span><span class="si">{:&gt;10}</span><span class="s1">   </span><span class="si">{:&lt;15}</span><span class="s1"> </span><span class="si">{dur}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s1">&#39;Processed Image&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;CRS: </span><span class="si">{}</span><span class="s1"> To  </span><span class="si">{}</span><span class="s1">, nodata: </span><span class="si">{}</span><span class="s1"> To </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">image_epsg</span><span class="p">,</span> <span class="n">out_epsg</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">nodata</span><span class="p">,</span> <span class="n">image_nodata</span><span class="p">),</span>
+                <span class="n">dur</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># calculate the new affine transform for to use for reprojection.</span>
+            <span class="n">transform</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">calculate_default_transform</span><span class="p">(</span><span class="n">src_crs</span><span class="p">,</span> <span class="n">dst_crs</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+                                                                   <span class="n">src</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="o">*</span><span class="n">src</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+
+            <span class="c1"># update the parameters for the output file</span>
+            <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;crs&#39;</span><span class="p">:</span> <span class="n">dst_crs</span><span class="p">,</span> <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="n">transform</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="n">width</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="n">height</span><span class="p">})</span>
+
+            <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">out_imagefile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">)</span> <span class="k">as</span> <span class="n">dest</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">band_nums</span><span class="p">:</span>
+                    <span class="n">reproject</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">band</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span>
+                              <span class="n">destination</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">band</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span>
+                              <span class="n">src_transform</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span>
+                              <span class="n">src_crs</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+                              <span class="n">dst_transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+                              <span class="n">dst_crs</span><span class="o">=</span><span class="n">dst_crs</span><span class="p">,</span>
+                              <span class="n">resampling</span><span class="o">=</span><span class="n">resampling</span><span class="p">)</span>
+
+                    <span class="c1"># image statistics have changed so copy only the other tags</span>
+                    <span class="n">cleaned_tags</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">tags</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span>
+                                         <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;STATISTIC&#39;</span><span class="p">)])</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cleaned_tags</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">dest</span><span class="o">.</span><span class="n">update_tags</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="o">**</span><span class="n">cleaned_tags</span><span class="p">)</span>
+
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="s1"> </span><span class="si">{:&gt;10}</span><span class="s1">   </span><span class="si">{:&lt;15}</span><span class="s1"> </span><span class="si">{dur}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s1">&#39;Reproject Image&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;From </span><span class="si">{}</span><span class="s1"> To  </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">image_epsg</span><span class="p">,</span> <span class="n">out_epsg</span><span class="p">),</span>
+                <span class="n">dur</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span>
+
+            <span class="k">del</span> <span class="n">transform</span></div>
+
+
+<div class="viewcode-block" id="stack_and_clip_rasters"><a class="viewcode-back" href="../../reference/pyprecag.raster_ops.html#pyprecag.raster_ops.stack_and_clip_rasters">[docs]</a><span class="k">def</span> <span class="nf">stack_and_clip_rasters</span><span class="p">(</span><span class="n">raster_files</span><span class="p">,</span> <span class="n">use_common</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_tif</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Combine multiple single band files into a single multi band raster where one band represents</span>
+<span class="sd">    one file. The filename will be saved in the bands tag. Optionally a minimum common area mask</span>
+<span class="sd">    can be applied.</span>
+
+<span class="sd">    All input rasters MUST be of the same coordinate system and pixel size.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        raster_files (List[str]): list of raster files to process</span>
+<span class="sd">        use_common (bool):  if true input rasters will be masked to the minimum common data area</span>
+<span class="sd">        output_tif (str):  output tif name. if omitted will be created in TEMPDIR</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str(): The output tif file</span>
+<span class="sd">        list(): A list of the band tags. (ie order of allocation to bands)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if output_tif doesn&#39;t include a path then add tempdir as well as overwriting it</span>
+    <span class="k">if</span> <span class="n">output_tif</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">output_tif</span><span class="p">):</span>
+        <span class="n">output_tif</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEMPDIR</span><span class="p">,</span> <span class="n">output_tif</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output_tif</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">get_debug_mode</span><span class="p">():</span>
+        <span class="c1"># get a unique name, it will create, open the file and delete after saving the variable</span>
+        <span class="k">with</span> <span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">inspect</span><span class="o">.</span><span class="n">getframeinfo</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">())[</span><span class="mi">2</span><span class="p">]),</span>
+                <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;.tif&#39;</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="n">TEMPDIR</span><span class="p">)</span> <span class="k">as</span> <span class="n">new_file</span><span class="p">:</span>
+            <span class="n">output_tif</span> <span class="o">=</span> <span class="n">new_file</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">del</span> <span class="n">new_file</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raster_files</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid Type: raster_files should be a list&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raster_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid Type: Empty list of raster files&#39;</span><span class="p">)</span>
+
+    <span class="n">not_exists</span> <span class="o">=</span> <span class="p">[</span><span class="n">my_file</span> <span class="k">for</span> <span class="n">my_file</span> <span class="ow">in</span> <span class="n">raster_files</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">my_file</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">not_exists</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;raster_files: </span><span class="si">{}</span><span class="s1"> raster file(s) do &#39;</span>
+                      <span class="s1">&#39;not exist</span><span class="se">\n\t</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">not_exists</span><span class="p">),</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">not_exists</span><span class="p">)))</span>
+
+    <span class="n">check_pixelsize</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">check_crs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">ea_raster</span> <span class="ow">in</span> <span class="n">raster_files</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">ea_raster</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">check_crs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ea_raster</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">res</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">check_pixelsize</span><span class="p">:</span>
+                <span class="n">check_pixelsize</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">res</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">check_pixelsize</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">resolution</span> <span class="o">=</span> <span class="n">check_pixelsize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;raster_files are of different pixel sizes - </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">check_pixelsize</span><span class="p">))))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">check_crs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> raster(s) don&#39;t have coordinates &quot;</span>
+                        <span class="s2">&quot;systems assigned </span><span class="se">\n\t</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">check_crs</span><span class="p">),</span><span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">check_crs</span><span class="p">)))</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">step_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Make sure ALL masks are saved inside the TIFF file not as a sidecar.</span>
+    <span class="n">gdal</span><span class="o">.</span><span class="n">SetConfigOption</span><span class="p">(</span><span class="s1">&#39;GDAL_TIFF_INTERNAL_MASK&#39;</span><span class="p">,</span> <span class="s1">&#39;YES&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Find minimum overlapping extent of all rasters ------------------------------------</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ea_raster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">raster_files</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">ea_raster</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+
+                <span class="n">band1</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="c1"># get minimum data extent</span>
+                <span class="n">data_window</span> <span class="o">=</span> <span class="n">get_data_window</span><span class="p">(</span><span class="n">band1</span><span class="p">)</span>
+
+                <span class="c1"># find the intersection of all the windows</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">min_window</span> <span class="o">=</span> <span class="n">data_window</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># create a new window using the last coordinates based on this image in case</span>
+                    <span class="c1"># extents/pixel origins are different</span>
+                    <span class="n">min_img_window</span> <span class="o">=</span> <span class="n">from_bounds</span><span class="p">(</span><span class="o">*</span><span class="n">min_bbox</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span>
+
+                    <span class="c1"># find the intersection of the windows.</span>
+                    <span class="n">min_window</span> <span class="o">=</span> <span class="n">intersection</span><span class="p">(</span><span class="n">min_img_window</span><span class="p">,</span> <span class="n">data_window</span><span class="p">)</span><span class="o">.</span><span class="n">round_lengths</span><span class="p">(</span><span class="s1">&#39;ceil&#39;</span><span class="p">)</span>
+
+                <span class="c1"># convert the window co coordinates</span>
+                <span class="n">min_bbox</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">window_bounds</span><span class="p">(</span><span class="n">min_window</span><span class="p">)</span>
+
+                <span class="k">del</span> <span class="n">min_window</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get_debug_mode</span><span class="p">():</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="s1"> </span><span class="si">{:&lt;15}</span><span class="s1"> </span><span class="si">{dur}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s1">&#39;Found Common Extent&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">min_bbox</span><span class="p">,</span>
+                <span class="n">dur</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">step_time</span><span class="p">)))</span>
+
+    <span class="k">except</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">WindowError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># reword &#39;windows do not intersect&#39; error message</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,)</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Rasters (Images) do not overlap&quot;</span><span class="p">,)</span>
+
+        <span class="k">raise</span>  <span class="c1"># re-raise current exception</span>
+
+    <span class="c1"># Create the metadata for the overlapping extent image. ---------------------------------------</span>
+    <span class="n">transform</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">bbox</span> <span class="o">=</span> <span class="n">create_raster_transform</span><span class="p">(</span><span class="n">min_bbox</span><span class="p">,</span> <span class="n">resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                             <span class="n">buffer_by_pixels</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="c1"># update the new image metadata ---------------------------------------------------------------</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">raster_files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">raster_files</span><span class="p">),</span> <span class="s1">&#39;nodata&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9999</span><span class="p">,</span>
+                   <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="n">height</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="n">width</span><span class="p">,</span>
+                   <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="n">transform</span><span class="p">})</span>
+
+    <span class="sd">&#39;&#39;&#39; combine individual rasters into one multi-band tiff using reproject will </span>
+<span class="sd">           fit each raster to the same pixel origin</span>
+<span class="sd">           will crop to the min bbox</span>
+<span class="sd">           standardise the nodata values</span>
+<span class="sd">           apply nodata values to entire image including internal blocks&#39;&#39;&#39;</span>
+
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_tif</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+        <span class="n">band_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ea_raster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">raster_files</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">ea_raster</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">band_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">ea_raster</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+                <span class="n">reproject</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">band</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                          <span class="n">destination</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">band</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span>
+                          <span class="n">src_transform</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span>
+                          <span class="n">dst_transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+                          <span class="n">resampling</span><span class="o">=</span><span class="n">Resampling</span><span class="o">.</span><span class="n">nearest</span><span class="p">)</span>
+
+            <span class="n">dst</span><span class="o">.</span><span class="n">update_tags</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">image</span><span class="p">})</span>
+
+        <span class="n">dst</span><span class="o">.</span><span class="n">descriptions</span> <span class="o">=</span> <span class="n">band_list</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get_debug_mode</span><span class="p">():</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="s1"> </span><span class="si">{:&lt;15}</span><span class="s1"> </span><span class="si">{dur}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Rasters Combined&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                                                 <span class="n">dur</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">step_time</span><span class="p">)))</span>
+
+    <span class="c1"># find the common data area -------------------------------------------------------</span>
+    <span class="k">if</span> <span class="n">use_common</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_tif</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+            <span class="c1"># find common area across all bands as there maybe internal nodata values in some bands.</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># loop through all all the masks</span>
+            <span class="k">for</span> <span class="n">ea_mask</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">read_masks</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">mask</span> <span class="o">=</span> <span class="n">ea_mask</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">ea_mask</span>
+
+            <span class="c1"># change mask values to  0 = nodata, 1 = valid data</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">255</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="c1"># apply mask to all bands of file</span>
+            <span class="n">src</span><span class="o">.</span><span class="n">write_mask</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get_debug_mode</span><span class="p">():</span>
+            <span class="c1"># write mask to new file</span>
+            <span class="n">tmp_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEMPDIR</span><span class="p">,</span> <span class="n">output_tif</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.tif&#39;</span><span class="p">,</span> <span class="s1">&#39;_commonarea.tif&#39;</span><span class="p">))</span>
+
+            <span class="n">kwargs_tmp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">kwargs_tmp</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;nodata&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                               <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">get_minimum_dtype</span><span class="p">(</span><span class="n">mask</span><span class="p">)})</span>
+
+            <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_tmp</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_dst</span><span class="p">:</span>
+                <span class="n">tmp_dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="s1"> </span><span class="si">{:&lt;15}</span><span class="s1"> </span><span class="si">{dur}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Rasters Combined and clipped&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                                                 <span class="n">dur</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span>
+
+    <span class="n">gdal</span><span class="o">.</span><span class="n">SetConfigOption</span><span class="p">(</span><span class="s1">&#39;GDAL_TIFF_INTERNAL_MASK&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">output_tif</span><span class="p">,</span> <span class="n">band_list</span></div>
+
+
+<div class="viewcode-block" id="update_band_statistics_GDAL"><a class="viewcode-back" href="../../reference/pyprecag.raster_ops.html#pyprecag.raster_ops.update_band_statistics_GDAL">[docs]</a><span class="k">def</span> <span class="nf">update_band_statistics_GDAL</span><span class="p">(</span><span class="n">raster_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; update band statistics using GDAL. Not yet built into rasterio &quot;&quot;&quot;</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">raster_file</span><span class="p">,</span> <span class="n">gdal</span><span class="o">.</span><span class="n">GA_Update</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">RasterCount</span><span class="p">):</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">ComputeStatistics</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">band</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># save, close</span>
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="save_in_memory_raster_to_file"><a class="viewcode-back" href="../../reference/pyprecag.raster_ops.html#pyprecag.raster_ops.save_in_memory_raster_to_file">[docs]</a><span class="k">def</span> <span class="nf">save_in_memory_raster_to_file</span><span class="p">(</span><span class="n">memory_raster</span><span class="p">,</span> <span class="n">out_image</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save a rasterio memory file as a TIF to disk</span>
+
+<span class="sd">    if out_image does not contain a path, it will be save to the Temp Dir.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        memory_raster (rasterio.io.MemoryFile):</span>
+<span class="sd">        out_image (str): the tif image name.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: the image path and name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">memory_raster</span><span class="p">,</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">MemoryFile</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input raster is not a raster.io.MemoryFile&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">out_image</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;.tif&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;File Extension of </span><span class="si">{}</span><span class="s1"> is not supported. Please change to &#39;</span>
+                         <span class="s1">&#39;.tif (GeoTiff)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">out_image</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="n">out_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">out_image</span><span class="p">):</span>
+        <span class="n">out_image</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEMPDIR</span><span class="p">,</span> <span class="n">out_image</span><span class="p">)</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="n">memory_raster</span><span class="o">.</span><span class="n">open</span><span class="p">()</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">out_image</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">tfw</span><span class="o">=</span><span class="s1">&#39;YES&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">src</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span> <span class="k">as</span> <span class="n">dest</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">indexes</span><span class="p">:</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">i</span><span class="p">)</span>
+
+                <span class="n">cleaned_tags</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">tags</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span>
+                                     <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;STATISTIC&#39;</span><span class="p">)])</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cleaned_tags</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">dest</span><span class="o">.</span><span class="n">update_tags</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="o">**</span><span class="n">cleaned_tags</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get_debug_mode</span><span class="p">():</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;30}</span><span class="s1"> </span><span class="si">{:&lt;15}</span><span class="s1"> </span><span class="si">{dur}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Saved to file&#39;</span><span class="p">,</span> <span class="n">out_image</span><span class="p">,</span>
+                                                 <span class="n">dur</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">out_image</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

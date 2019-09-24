@@ -1,0 +1,884 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyprecag.processing &mdash; pyprecag 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyprecag.raster_ops" href="pyprecag.raster_ops.html" />
+    <link rel="prev" title="pyprecag.kriging_ops" href="pyprecag.kriging_ops.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pyprecag
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.bandops.html">pyprecag.bandops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.config.html">pyprecag.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.convert.html">pyprecag.convert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.crs.html">pyprecag.crs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.describe.html">pyprecag.describe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.errors.html">pyprecag.errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.kriging_ops.html">pyprecag.kriging_ops</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pyprecag.processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.raster_ops.html">pyprecag.raster_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.table_ops.html">pyprecag.table_ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyprecag.vector_ops.html">pyprecag.vector_ops</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyprecag</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+        
+      <li>pyprecag.processing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/reference/pyprecag.processing.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pyprecag.processing">
+<span id="pyprecag-processing"></span><h1>pyprecag.processing<a class="headerlink" href="#module-pyprecag.processing" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pyprecag.processing.block_grid">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">block_grid</code><span class="sig-paren">(</span><em>in_shapefilename</em>, <em>pixel_size</em>, <em>out_rasterfilename</em>, <em>out_vesperfilename</em>, <em>nodata_val=-9999</em>, <em>snap=True</em>, <em>overwrite=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#block_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.block_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a polygon boundary to a 0,1 raster and generate a VESPER compatible list of
+coordinates for kriging.</p>
+<blockquote>
+<div><p>Args:</p>
+<blockquote>
+<div>in_shapefilename (str): Input polygon shapefile
+pixel_size (float):  The required output pixel size
+out_rasterfilename (str): Filename of the raster Tiff that will be created
+out_vesperfilename (str):  The output vesper file
+nodata_val (int): an integer to use as nodata
+snap (bool): Snap Extent to a factor of the Pixel size
+overwrite (bool): if true overwrite existing file</div></blockquote>
+<p>Requirements: Input shapefile should be in a projected coordinate system……..</p>
+<dl class="docutils">
+<dt>Notes:</dt>
+<dd><p class="first">Define pixel_size and no data value of new raster
+see <a class="reference external" href="http://stackoverflow.com/questions/2220749/rasterizing-a-gdal-layer">http://stackoverflow.com/questions/2220749/rasterizing-a-gdal-layer</a></p>
+<blockquote>
+<div><a class="reference external" href="https://gis.stackexchange.com/a/31658">https://gis.stackexchange.com/a/31658</a></div></blockquote>
+<p class="last">This works, but the extent of the output differs from that of an arcpy generated raster.
+See post: <a class="reference external" href="https://gis.stackexchange.com/q/139336">https://gis.stackexchange.com/q/139336</a></p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.processing.calc_indices_for_block">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">calc_indices_for_block</code><span class="sig-paren">(</span><em>image_file</em>, <em>pixel_size</em>, <em>band_map</em>, <em>out_folder</em>, <em>indices=[]</em>, <em>image_epsg=0</em>, <em>image_nodata=None</em>, <em>polygon_shapefile=None</em>, <em>groupby=None</em>, <em>out_epsg=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#calc_indices_for_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.calc_indices_for_block" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Calculate indices for a multi band image then resample to a specified pixel size</dt>
+<dd><p class="first">and block grid extent for each shapefile polygon.</p>
+<p>Use this tool to create single band images, one for each index and shapefile polygon
+combination. A group-by column may be used to dissolve multiple polygons belonging to an
+individual block.</p>
+<p>If a polygon shapefile is not specified, polygons will be created from the images’ mask</p>
+<p>The polygon shapefile will be re-projected to match the image file</p>
+<p>A block grid will be created for each feature for the nominated pixel size and used as the
+base for analysis</p>
+<dl class="docutils">
+<dt>“image_epsg” and “image_nodata” can be used to set the coordinate system and image nodata</dt>
+<dd>values when they are not present within the image file.</dd>
+</dl>
+<p>The output filename will consist of the selected feature and calculated index.</p>
+<dl class="last docutils">
+<dt>The processing steps to achieve this are:</dt>
+<dd><ul class="first simple">
+<li>Reproject image to new coordinate system if required.</li>
+<li>Calculate indices</li>
+<li>Dissolve polygons optionally using the group-by column</li>
+</ul>
+<dl class="last docutils">
+<dt>Loop through each polygon feature and……</dt>
+<dd><ul class="first last simple">
+<li>Create Block Grid</li>
+<li>Clip image to polygon</li>
+<li>Resample and fit to block grid for a pixel size and using Average resampling technique</li>
+<li>Identify holes and fill if necessary</li>
+<li>smooth image using a 5x5 pixel moving average (focal_statistics)</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>image_file</strong> (<em>str</em>) – the input image file</li>
+<li><strong>pixel_size</strong> (<em>int</em>) – the pixel size used for resampling</li>
+<li><strong>band_map</strong> (<a class="reference internal" href="pyprecag.bandops.html#pyprecag.bandops.BandMapping" title="pyprecag.bandops.BandMapping"><em>pyprecag.bandops.BandMapping</em></a>) – A dictionary matching band numbers to
+band type (ie Red, Green, Blue etc.)</li>
+<li><strong>out_folder</strong> (<em>str</em>) – The output folder for the created images.</li>
+<li><strong>indices</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – The list of indices to calculate.</li>
+<li><strong>image_epsg</strong> (<em>int</em>) – epsg number of the image to be used when missing in image</li>
+<li><strong>image_nodata</strong> (<em>int</em>) – nodata value of the image to be used when missing in image</li>
+<li><strong>polygon_shapefile</strong> (<em>str</em>) – a polygon shapefile used to cut up an image.</li>
+<li><strong>groupby</strong> (<em>str</em>) – the column/field to use to group multiple features.</li>
+<li><strong>out_epsg</strong> (<em>int</em>) – The epsg number representing the coordinate system of the output images.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the list of created images.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List[str]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.processing.clean_trim_points">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">clean_trim_points</code><span class="sig-paren">(</span><em>points_geodataframe</em>, <em>points_crs</em>, <em>process_column</em>, <em>output_csvfile</em>, <em>boundary_polyfile=None</em>, <em>out_keep_shapefile=None</em>, <em>out_removed_shapefile=None</em>, <em>remove_zeros=True</em>, <em>stdevs=3</em>, <em>iterative=True</em>, <em>thin_dist_m=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#clean_trim_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.clean_trim_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean and/or Trim a points dataframe.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Preparation includes:</dt>
+<dd><ul class="first last simple">
+<li>Clip data to polygon.</li>
+<li>Move data to a Projected Coordinate system.</li>
+<li>Remove values where data_column are less than or equal to zero</li>
+<li>Calculate Normalised value for data_column (number of StDev).</li>
+<li>Iteratively Trim outliers based on Normalised data_column</li>
+<li>Remove points closer than a set distance (trim_dist_m)</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>points_geodataframe</strong> (<em>geopandas.geodataframe.GeoDataFrame</em>) – The input points geodataframe</li>
+<li><strong>points_crs</strong> (<em>pyprecag_crs.crs</em>) – The Spatial Reference System of the point_geodataframe</li>
+<li><strong>process_column</strong> (<em>str</em>) – The column  to normalise, trim and clean.</li>
+<li><strong>output_csvfile</strong> (<em>str</em>) – The Trimmed &amp; Cleaned output CSV file</li>
+<li><strong>out_keep_shapefile</strong> (<em>str</em>) – Optionally save the Trimmed &amp; Cleaned to a shapefile</li>
+<li><strong>out_removed_shapefile</strong> (<em>str</em>) – Optionally save a shapefile containing features removed while
+cleaning/filtering. A column called filter will be added showing the reason a
+point was removed.</li>
+<li><strong>boundary_polyfile</strong> (<em>str</em>) – Optionally a polygon used to Clip the points.</li>
+<li><strong>remove_zeros</strong> (<em>bool</em>) – Optionally remove values where data_column are &lt;= to zero
+prior to removing outliers.</li>
+<li><strong>stdevs</strong> (<em>int</em>) – The number of standard deviations used to trim outliers</li>
+<li><strong>iterative</strong> (<em>bool</em>) – Optionally Iteratively Trim outliers based on Normalised Data column</li>
+<li><strong>thin_dist_m</strong> (<em>float</em>) – A distance in metres representing the minimum allowed distance
+between points. Points less than this distance will be removed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Representing the cleaned/trimmed data file.</dt>
+<dd><dl class="first last docutils">
+<dt>New columns included in the output are:</dt>
+<dd><p class="first last">Eastings, Northings  - The point coordinates in a projected coordinate system
+EN_Epsg  - The epsg number of the projected coordinate system
+<a href="#id1"><span class="problematic" id="id2">Nrm_</span></a>    - normalise data_column calculation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>pyprecag_crs.crs: The pyprecag CRS object of the points dataframe.</p>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">geopandas.geodataframe.GeoDataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.processing.create_points_along_line">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">create_points_along_line</code><span class="sig-paren">(</span><em>lines_geodataframe</em>, <em>lines_crs</em>, <em>distance_between_points</em>, <em>offset_distance</em>, <em>out_epsg=0</em>, <em>out_points_shapefile=None</em>, <em>out_lines_shapefile=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#create_points_along_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.create_points_along_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add points along a line using a specified distance and create left/right parallel points
+offset by a distance.</p>
+<p>If the lines are in a geographic coordinate system they will be re-projected to a projected
+coordinate system.</p>
+<p>All touching lines will be treated as one.
+MultiPart geometry will be converted to single part geometry.
+The first and last points will be offset from start/end of the line evenly.
+Attributes from the input lines will be lost.</p>
+<p>line_crs is used to ensure that the correct wkt definition is maintained when using
+geopandas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lines_geodataframe</strong> (<em>geopandas.geodataframe.GeoDataFrame</em>) – A Geopandas dataframe
+containing Lines</li>
+<li><strong>lines_crs</strong> (<a class="reference internal" href="pyprecag.crs.html#pyprecag.crs.crs" title="pyprecag.crs.crs"><em>pyprecag.crs.crs</em></a>) – The detailed coordinate system</li>
+<li><strong>distance_between_points</strong> (<em>int</em>) – The separation distance between points.</li>
+<li><strong>offset_distance</strong> (<em>int</em>) – The distance between the Strip point and parallel point.</li>
+<li><strong>out_epsg</strong> (<em>int</em>) – Optionally specify the epsg number for the output coordinate system.
+This should be a project coordinate system</li>
+<li><strong>out_points_shapefile</strong> (<em>str</em>) – Optionally specify shapefile path and filename used to
+save the points to. If a path is not supplied, it will save the file
+to TEMPDIR  by default.</li>
+<li><strong>out_lines_shapefile</strong> (<em>str</em>) – Optionally specify shapefile path and filename used to save
+the lines to. If a path is not supplied, it will save the file to
+TEMPDIR  by default</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The geodataframe containing the created points.
+pyprecag.crs.crs: The coordinate system of both the points and lines geodataframe.
+geopandas.geodataframe.GeoDataFrame: The geodataframe containing the created lines.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">geopandas.geodataframe.GeoDataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.processing.create_polygon_from_point_trail">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">create_polygon_from_point_trail</code><span class="sig-paren">(</span><em>points_geodataframe</em>, <em>points_crs</em>, <em>out_filename</em>, <em>thin_dist_m=1.0</em>, <em>aggregate_dist_m=25</em>, <em>buffer_dist_m=10</em>, <em>shrink_dist_m=3</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#create_polygon_from_point_trail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.create_polygon_from_point_trail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a polygon from a Point Trail created from a file containing GPS coordinates.</p>
+<p>The point order should be sorted by increasing time sequence to ensure the ‘dot-to-dot’ occurs
+correctly.</p>
+<dl class="docutils">
+<dt>The workflow is as follows:</dt>
+<dd>Points -&gt; Lines -&gt; Buffer Out (expand) -&gt; Buffer In (shrink)</dd>
+</dl>
+<p>For efficiency, points will be thinned. This will remove points less than the set thinDist.
+Resulting points will be connected to form lines.</p>
+<dl class="docutils">
+<dt>Line ends are detected where the distance between points is greater than the aggregate distance.</dt>
+<dd>This will occur at a turning point or interruption (ie creek) and gps point collection is</dd>
+</dl>
+<p>stopped. Typically this distance is slightly greater than the row/swath width.</p>
+<p>Buffering is used to convert to polygon and remove the gap between row_count/swaths. The buffer
+distance is usually half the row/swath width.</p>
+<p>Buffering with a negative value is used to remove excess area on the outside of the polygon.
+This shrink distance is usually around 7m less than the buffer distance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>points_geodataframe</strong> (<em>geopandas.geodataframe.GeoDataFrame</em>) – Input points vector geodataframe</li>
+<li><strong>points_crs</strong> (<em>pyprecag_crs.crs</em>) – The Projected Spatial Reference System of the
+point_geodataframe</li>
+<li><strong>out_filename</strong> (<em>str</em>) – Output polygon file. This should be the same format as the input.</li>
+<li><strong>thin_dist_m</strong> (<em>float</em>) – The minimum distance in metres between points to be used to thin the
+points dataset.</li>
+<li><strong>aggregate_dist_m</strong> (<em>int</em>) – A floating number representing the maximum distance between point.
+This is used to detect a line end. Typically this is slightly larger than
+the row/swath width.</li>
+<li><strong>buffer_dist_m</strong> (<em>int</em>) – The Buffer distance in metres. Typically half the swath or row width.</li>
+<li><strong>shrink_dist_m</strong> (<em>int</em>) – The shrink distance in metres. Typically about 7 less than the buffer
+distance.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.processing.extract_pixel_statistics_for_points">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">extract_pixel_statistics_for_points</code><span class="sig-paren">(</span><em>points_geodataframe, points_crs, rasterfiles, output_csvfile, function_list=[&lt;function nanmean&gt;], size_list=[3]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#extract_pixel_statistics_for_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.extract_pixel_statistics_for_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract statistics from a list of rasters at set locations.</p>
+<p>All raster files in the list should be of the same pixel size. While multi-bands raster files
+are supported as an input, statistics will only be calculated and extracted for the first band.</p>
+<p>Statistics are calculated on pixel values with a square neighbourhood and saved to a CSV file.</p>
+<p>Pixels assigned with Nodata are converted to np.nan and excluded from the calculations.</p>
+<p>All original columns are included in the output csv file in addition to columns containing the
+values for each raster -&gt; size -&gt; statistic combination.  The column names can either be
+specified or derived via the out_colname argument in raster_ops.focal_statistics.</p>
+<p>A size of 1 can be used to extract exact pixel values and whereby no statistics are calculated.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>points_geodataframe</strong> (<em>geopandas.geodataframe.GeoDataFrame</em>) – The input points geodataframe of
+locations to extract statistics.</li>
+<li><strong>points_crs</strong> (<em>pyprecag_crs.crs</em>) – The Spatial Reference System of the point_geodataframe</li>
+<li><strong>rasterfiles</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – the list of paths &amp; file names for the input rasters</li>
+<li><strong>output_csvfile</strong> (<em>str</em>) – the path and filename of the output CSV.</li>
+<li><strong>function_list</strong> (<em>List</em><em>[</em><em>function</em><em>]</em>) – A list of statistical functions to apply to the raster.
+These can include numpy functions like np.nanmean or custom ones like pixel_count</li>
+<li><strong>size_list</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – The list of neighbourhood sizes used to apply statistical filtering.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dataframe of the points and calculated statistics
+pyprecag_crs.crs: The pyprecag CRS object of the points dataframe.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">geopandas.geodataframe.GeoDataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.processing.kmeans_clustering">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">kmeans_clustering</code><span class="sig-paren">(</span><em>raster_files</em>, <em>output_tif</em>, <em>n_clusters=3</em>, <em>max_iterations=500</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#kmeans_clustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.kmeans_clustering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create zones with k-means clustering from multiple raster files as described in</p>
+<dl class="docutils">
+<dt>The input raster files should all:</dt>
+<dd><ul class="first last simple">
+<li>have the same pixel size</li>
+<li>be in the same coordinate system</li>
+<li>should overlap</li>
+</ul>
+</dd>
+</dl>
+<p>Only the first band of each raster will be used.</p>
+<p>The output TIFF image extent will be the minimum overlapping extent of the input images.
+Each image will be resampled to a fixed coordinate to ensure pixels between images align.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>raster_files</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – The list of input raster files</li>
+<li><strong>output_tif</strong> (<em>str</em>) – The output TIFF file</li>
+<li><strong>n_clusters</strong> (<em>int</em>) – The number of clusters/zones to create.</li>
+<li><strong>max_iterations</strong> (<em>int</em>) – Maximum number of iterations for k-means algorithm in a single run.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A dataframe containing cluster statistics for each image.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.core.frame.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.processing.multi_block_bands_processing">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">multi_block_bands_processing</code><span class="sig-paren">(</span><em>image_file</em>, <em>pixel_size</em>, <em>out_folder</em>, <em>band_nums=[]</em>, <em>image_epsg=0</em>, <em>image_nodata=0</em>, <em>polygon_shapefile=None</em>, <em>groupby=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#multi_block_bands_processing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.multi_block_bands_processing" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Derive multiple resampled image bands matching the specified pixel size and block grid extent</dt>
+<dd>for each shapefile polygon.</dd>
+</dl>
+<p>Use this tool create individual band images for each polygon within a shapefile. A group-by
+column may be used to dissolve multiple polygons belonging to an individual block. The fitting
+of rasters to a base Block (grid) ensures for easier, more accurate multi-layered analysis
+required by in Precision Agriculture.</p>
+<dl class="docutils">
+<dt>The processing steps to achieve this are:</dt>
+<dd><ul class="first simple">
+<li>Dissolve polygons optionally using the group-by column</li>
+</ul>
+<dl class="last docutils">
+<dt>Loop through each polygon feature and……</dt>
+<dd><ul class="first last simple">
+<li>Create Block Grid</li>
+<li>Clip image to polygon</li>
+<li>Resample and fit to block grid for a pixel size and using Average resampling technique</li>
+<li>Identify holes and fill if necessary</li>
+<li>smooth image using a 5x5 pixel moving average (focal_statistics)</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>If a polygon shapefile is not specified, polygons will be created from the images’ mask</p>
+<p>The polygon shapefile will be re-projected to match the image file</p>
+<p>A block grid will be created for each feature for the nominated pixel size and used as the base
+for analysis</p>
+<dl class="docutils">
+<dt>“image_epsg” and “image_nodata” can be used to set the coordinate system and image nodata values</dt>
+<dd>when they are not present within the image file.</dd>
+</dl>
+<p>The output filename will consist of the selected band number or the value of a band’s rasterio
+custom name tag</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>image_file</strong> (<em>str</em>) – An input image</li>
+<li><strong>pixel_size</strong> (<em>int</em><em>, </em><em>float</em>) – The desired output pixel size in metres.</li>
+<li><strong>out_folder</strong> (<em>str</em>) – The output folder for the created images.</li>
+<li><strong>band_nums</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – a list of band numbers to process. If empty all bands will be used</li>
+<li><strong>image_epsg</strong> (<em>int</em>) – the epsg number for the image. Only used if not provided by the image.</li>
+<li><strong>image_nodata</strong> (<em>int</em>) – the nodata value for the image. Only used if not provided by the image.</li>
+<li><strong>polygon_shapefile</strong> (<em>str</em>) – a polygon shapefile used to cut up an image.</li>
+<li><strong>groupby</strong> (<em>str</em>) – the column/field to use to group multiple features.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a list of created files.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List[str]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.processing.persistor_all_years">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">persistor_all_years</code><span class="sig-paren">(</span><em>raster_files</em>, <em>output_tif</em>, <em>greater_than</em>, <em>target_percentage</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#persistor_all_years"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.persistor_all_years" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the performance persistence of yield by across multiple years as described in
+Bramley and Hamilton (2005)</p>
+<p>The “Target over all years” method assigns a value to each pixel to indicate the number of
+instances (in the raster list) in which that pixel was either less than or greater than
+the mean (+/- a nominated percentage) of that raster.</p>
+<blockquote>
+<div><p>All input rasters MUST overlap and have the same coordinate system and pixel size.</p>
+<p>If a path is omitted from output_tif it will be created in your temp folder.</p>
+</div></blockquote>
+<p class="rubric">References</p>
+<p>Bramley RGV, Hamilton RP (2005) Understanding variability in winegrape production systems
+1. Within vineyard variation in yield over several vintages. Australian Journal Of Grape And
+Wine Research 10, 32-45. doi:10.1111/j.1755-0238.2004.tb00006.x.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>raster_files</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of rasters to use as inputs</li>
+<li><strong>output_tif</strong> (<em>str</em>) – Output TIF file</li>
+<li><strong>greater_than</strong> (<em>bool</em>) – if true test above (gt) the mean</li>
+<li><strong>target_percentage</strong> (<em>int</em>) – the percent variation either above/below the mean.
+This should be a integer between -50 and 50</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The output tif name</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.processing.persistor_target_probability">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">persistor_target_probability</code><span class="sig-paren">(</span><em>upper_raster_files</em>, <em>upper_percentage</em>, <em>upper_probability</em>, <em>lower_raster_files</em>, <em>lower_percentage</em>, <em>lower_probability</em>, <em>output_tif</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#persistor_target_probability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.persistor_target_probability" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Determine the probability of a performance being exceeded or not being met with an upper and</dt>
+<dd>lower limit as described in Bramley and Hamilton (2005).</dd>
+</dl>
+<p>The “Target probability” method builds on the target over all years method, in that it includes
+an upper range (i.e. cells with a given frequency of values that are above the mean +/- a</p>
+<blockquote>
+<div>given percentage) and a lower range (i.e. cells with a given frequency of values that are
+below the mean +/- a given percentage).</div></blockquote>
+<p>A value is assigned to each pixel which indicates whether the performance in that pixel over
+a given proportion of years is:</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li>Greater than the mean plus or minus the nominated percentage (value = 1)</li>
+</ol>
+<p>b)      Less than the mean plus or minus the nominated percentage (value = -1)
+The remaining pixels which do not fall into category a) or b) are given a value of 0.</p>
+</div></blockquote>
+<p>All input rasters MUST overlap and have the same coordinate system and pixel size.</p>
+<p>If a path is omitted from output_tif it will be created in your temp folder.</p>
+<p class="rubric">References</p>
+<p>Bramley RGV, Hamilton RP (2005) Understanding variability in winegrape production systems
+1. Within vineyard variation in yield over several vintages. Australian Journal Of Grape
+And Wine Research 10, 32-45. doi:10.1111/j.1755-0238.2004.tb00006.x.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>upper_raster_files</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of rasters to used for the analysis of the
+UPPER category</li>
+<li><strong>upper_percentage</strong> (<em>int</em>) – the percent variation either above/below the mean to apply
+to the UPPER raster category.</li>
+<li><strong>upper_probability</strong> (<em>int</em>) – the probability percentage to apply to the LOWER category</li>
+<li><strong>lower_raster_files</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of rasters to used for the analysis of the
+LOWER category</li>
+<li><strong>lower_percentage</strong> (<em>int</em>) – the percent variation either above/below the mean to apply
+to the LOWER raster category.</li>
+<li><strong>lower_probability</strong> (<em>int</em>) – the probability percentage to apply to the LOWER category</li>
+<li><strong>output_tif</strong> (<em>str</em>) – Output TIF file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.processing.random_pixel_selection">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">random_pixel_selection</code><span class="sig-paren">(</span><em>raster</em>, <em>raster_crs</em>, <em>num_points</em>, <em>out_shapefile=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#random_pixel_selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.random_pixel_selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select randomly distributed valid data pixels from a raster file and convert to points
+representing the center of the pixel. There is an option to save to shapefile if required.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last docutils">
+<dt>When opening a raster using RasterIO the coordinate system is imported from the Proj4 string</dt>
+<dd><dl class="first last docutils">
+<dt>and converted to a crs_wkt. This means that the crs_wkt recorded against the opened dataset</dt>
+<dd>does not always equal the crs_wkt of the original raster file. To remedy this, use
+pyprecag_crs.getCRSfromRasterFile to create a crs object</dd>
+</dl>
+</dd>
+</dl>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>raster</strong> (<em>rasterio.io.DatasetReader</em>) – Opened raster file via rasterio.open(os.path.normpath())</li>
+<li><strong>num_points</strong> (<em>int</em>) – The number of random sample points to select.</li>
+<li><strong>raster_crs</strong> (<em>pyprecag_crs.crs</em>) – The Spatial Reference System for the raster file</li>
+<li><strong>out_shapefile</strong> (<em>str</em>) – Optional.. the path and name of a shapefile used to save the points.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A dataframe containing the select pixels as points
+pyprecag_crs.crs: The pyprecag CRS object of the points dataframe.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">geopandas.geodataframe.GeoDataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.processing.resample_bands_to_block">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">resample_bands_to_block</code><span class="sig-paren">(</span><em>image_file</em>, <em>pixel_size</em>, <em>out_folder</em>, <em>band_nums=[]</em>, <em>image_epsg=0</em>, <em>image_nodata=None</em>, <em>polygon_shapefile=None</em>, <em>groupby=None</em>, <em>out_epsg=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#resample_bands_to_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.resample_bands_to_block" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Derive multiple resampled image bands matching the specified pixel size and block grid extent</dt>
+<dd>for each shapefile polygon.</dd>
+</dl>
+<p>Use this tool create individual band images for each polygon within a shapefile. A group-by
+column may be used to dissolve multiple polygons belonging to an individual block. The fitting
+of rasters to a base Block (grid) ensures for easier, more accurate multi-layered analysis
+required by in Precision Agriculture.</p>
+<dl class="docutils">
+<dt>The processing steps to achieve this are:</dt>
+<dd><ul class="first simple">
+<li>Reproject image to nominated coordinate system</li>
+<li>Dissolve polygons optionally using the groupby column</li>
+</ul>
+<dl class="last docutils">
+<dt>Loop through each polygon feature and……</dt>
+<dd><ul class="first last simple">
+<li>Create Block Grid</li>
+<li>Clip image to polygon</li>
+<li>Resample and fit to block grid for a pixel size and using Average resampling technique</li>
+<li>Identify holes and fill if necessary</li>
+<li>smooth image using a 5x5 pixel moving average (focal_statistics)</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>If a polygon shapefile is not specified, polygons will be created from the images’ mask</p>
+<p>The polygon shapefile will be re-projected to match the image file</p>
+<p>A block grid will be created for each feature for the nominated pixel size and used as the
+base for analysis</p>
+<dl class="docutils">
+<dt>“image_epsg” and “image_nodata” can be used to set the coordinate system and image nodata values</dt>
+<dd>when they are not present within the image file.</dd>
+</dl>
+<p>The output filename will consist of the selected band number or the value of a band’s rasterio
+custom name tag</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>image_file</strong> (<em>str</em>) – An input image</li>
+<li><strong>pixel_size</strong> (<em>int</em><em>, </em><em>float</em>) – The desired output pixel size in metres.</li>
+<li><strong>out_folder</strong> (<em>str</em>) – The output folder for the created images.</li>
+<li><strong>band_nums</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – a list of band numbers to process. If empty all bands will be used</li>
+<li><strong>image_epsg</strong> (<em>int</em>) – epsg number of the image to be used when missing in image</li>
+<li><strong>image_nodata</strong> (<em>int</em>) – nodata value of the image to be used when missing in image</li>
+<li><strong>polygon_shapefile</strong> (<em>str</em>) – a polygon shapefile used to cut up an image.</li>
+<li><strong>groupby</strong> (<em>str</em>) – the column/field to use to group multiple features.</li>
+<li><strong>out_epsg</strong> (<em>int</em>) – The epsg number representing the output coordinate system.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a list of created files.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List[str]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyprecag.processing.ttest_analysis">
+<code class="descclassname">pyprecag.processing.</code><code class="descname">ttest_analysis</code><span class="sig-paren">(</span><em>points_geodataframe</em>, <em>points_crs</em>, <em>values_raster</em>, <em>out_folder</em>, <em>zone_raster=''</em>, <em>control_raster=''</em>, <em>size=5</em>, <em>create_graph=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyprecag/processing.html#ttest_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyprecag.processing.ttest_analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a moving window t-test analysis for a strip trial as described in Lawes
+and Bramley (2012).</p>
+<p>Format of the points must be from the create_points_along_line tools.
+All input rasters must be of the same coordinate system and pixel size and overlap with the
+points.</p>
+<dl class="docutils">
+<dt>Output statistics include:</dt>
+<dd>controls_mean  - row by row mean of the control columns
+treat_diff -   row by row difference between the treatment and controls_mean columns
+av_treat_diff - calculate mean of values using a moving window using the treat_diff column
+p_value - calculate  p_value using a moving window using treatment and controls_mean columns
+RI  - Response Index using the treatment and controls_mean columns</dd>
+<dt>Output Files include:</dt>
+<dd><dl class="first last docutils">
+<dt>For each line and strip combination :</dt>
+<dd><ul class="first last simple">
+<li>png Map showing orientation of the line (start and ends)</li>
+<li>png set of graphs</li>
+<li>CSV file of derived statistics.</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt>Reference:</dt>
+<dd><dl class="first last docutils">
+<dt>Lawes RA, Bramley RGV. 2012. A Simple Method for the Analysis of On-Farm Strip Trials.</dt>
+<dd>Agronomy Journal 104, 371-377.</dd>
+</dl>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>points_geodataframe</strong> (<em>geopandas.geodataframe.GeoDataFrame</em>) – points derived using
+create_points_along_line</li>
+<li><strong>points_crs</strong> (<a class="reference internal" href="pyprecag.crs.html#pyprecag.crs.crs" title="pyprecag.crs.crs"><em>pyprecag.crs.crs</em></a>) – the coordinate system for the points.</li>
+<li><strong>values_raster</strong> (<em>str</em>) – a kriged raster containing the treatment  values</li>
+<li><strong>out_folder</strong> (<em>str</em>) – folder for output files.</li>
+<li><strong>zone_raster</strong> (<em>str</em>) – a raster containing zones.</li>
+<li><strong>control_raster</strong> (<em>str</em>) – a kriged raster of</li>
+<li><strong>size</strong> (<em>int</em>) – the size used to calculate the moving window statistics.</li>
+<li><strong>create_graph</strong> (<em>bool</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dataframe containing output statistics</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.core.frame.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pyprecag.raster_ops.html" class="btn btn-neutral float-right" title="pyprecag.raster_ops" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pyprecag.kriging_ops.html" class="btn btn-neutral float-left" title="pyprecag.kriging_ops" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, CSIRO
+      <span class="lastupdated">
+        Last updated on Sep 24, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
