@@ -1,0 +1,37 @@
+name: Checkout pyprecag on Ubuntu. Build html documents from pyprecag and commit any updates.
+
+on: 
+    push:
+    schedule: ## Schedule to run at midnight
+    - cron: '0 0 * * *'
+
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+    - name: Add conda to system path
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
+    - name: Install dependencies
+      run: |
+        conda install sphinx
+        conda install sphinx_rtd_theme
+    - name: Checkout latest pyprecag
+      run: |
+        echo "Do a git checkout of the latest mnbMerge2Maint branch of pyprecag"
+        git clone -b mnbMerge2Maint --single-branch --depth 1 https://github.com/CSIRO-Precision-Agriculture/pyprecag.git
+        cd pyprecag; make html
+
+
+
+
