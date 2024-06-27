@@ -36,7 +36,7 @@ jobs:
         cd pyprecag
         pip install .
         make html
-- name: Use Sphinx to build html docs from pyprecag source code
+    - name: Use Sphinx to build html docs from pyprecag source code
       run: |
         cd pyprecag
         make html
