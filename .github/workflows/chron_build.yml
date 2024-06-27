@@ -24,6 +24,9 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Install dependencies
       run: |
+        conda install gdal
+        conda install fiona
+        conda install geopandas
         conda install sphinx
         conda install sphinx_rtd_theme
     - name: Checkout latest pyprecag
@@ -33,7 +36,4 @@ jobs:
         cd pyprecag
         pip install .
         make html
-
-
-
 
