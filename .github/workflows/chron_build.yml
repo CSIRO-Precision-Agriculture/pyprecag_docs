@@ -30,8 +30,9 @@ jobs:
       run: |
         echo "Do a git checkout of the latest mnbMerge2Maint branch of pyprecag"
         git clone -b mnbMerge2Maint --single-branch --depth 1 https://github.com/CSIRO-Precision-Agriculture/pyprecag.git
-        pip install .\pyprecag
-        cd pyprecag; make html
+        cd pyprecag
+        pip install .
+        make html
 
 
 
