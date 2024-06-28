@@ -78,7 +78,7 @@ jobs:
         echo "Call a git diff"
         cd pyprecag_docs
         git diff > diff.log
-        ls -latr
+        dir
     - name: Upload diff.log file as artifact
       uses: actions/upload-artifact@v4
       with:
