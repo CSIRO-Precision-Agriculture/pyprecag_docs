@@ -40,9 +40,6 @@ jobs:
       run: |
         cd pyprecag
         make html
-        ls /build/docs/html
-        cd ..
-        ls *.html | xargs -I % diff % ./pyprecag/build/docs/html/% --brief -s
     - name: Check and compare html docs
       run: |
         echo "List pyprecag/build/docs/html"
