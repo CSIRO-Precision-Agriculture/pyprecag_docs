@@ -76,5 +76,6 @@ jobs:
         echo "List pyprecag_docs html files"
         ls ./pyprecag_docs
         echo "Call a git diff"
+        cd pyprecag_docs
         git diff > diff.log
         
