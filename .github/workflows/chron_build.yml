@@ -46,7 +46,7 @@ jobs:
         echo "List pyprecag/build/docs html files"
         ls ./pyprecag/build/docs/html
         echo "List pyprecag_docs html files"
-        ls ./pyprecg_docs
+        ls ./pyprecag_docs
         #echo "List pyprecag/build/docs/html"
         ls ./pyprecag/build/docs/html
         #echo "Compare usage.html file"
