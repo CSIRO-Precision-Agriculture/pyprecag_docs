@@ -64,10 +64,9 @@ jobs:
         ls ./pyprecag/build/docs/html
         echo "List pyprecag_docs html files"
         ls ./pyprecag_docs
-        #echo "List pyprecag/build/docs/html"
-        ls ./pyprecag/build/docs/html
-        #echo "Compare usage.html file"
-        #diff usage.html ./pyprecag/build/docs/html/usage.html
-        #ls *.html | xargs -I % diff % ./pyprecag/build/docs/html/% --brief -s; exit 0
-        #echo "Compare all html files"
-        #ls *.html | xargs -I % diff % ./pyprecag/build/docs/html/% --brief -s; exit 0
+    - name: Attempt to overwrite html files
+      run: |
+        git rm -r *
+        cd ..        
+        echo "List pyprecag_docs html files"
+        ls ./pyprecag_docs
