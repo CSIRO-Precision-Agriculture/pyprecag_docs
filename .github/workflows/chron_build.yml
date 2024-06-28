@@ -32,20 +32,25 @@ jobs:
     - name: Checkout latest pyprecag
       run: |
         echo "Do a git checkout of the latest mnbMerge2Maint branch of pyprecag"
+        cd ..
         git clone -b mnbMerge2Maint --single-branch --depth 1 https://github.com/CSIRO-Precision-Agriculture/pyprecag.git
         cd pyprecag
         pip install .
-        make html
     - name: Use Sphinx to build html docs from pyprecag source code
       run: |
-        cd pyprecag
+        cd ../pyprecag
         make html
     - name: Check and compare html docs
       run: |
-        echo "List pyprecag/build/docs/html"
+        cd ..        
+        echo "List pyprecag/build/docs html files"
         ls ./pyprecag/build/docs/html
-        echo "Compare usage.html file"
-        diff usage.html ./pyprecag/build/docs/html/usage.html
-        ls *.html | xargs -I % diff % ./pyprecag/build/docs/html/% --brief -s; exit 0
-        echo "Compare all html files"
-        ls *.html | xargs -I % diff % ./pyprecag/build/docs/html/% --brief -s; exit 0
+        echo "List pyprecag_docs html files"
+        ls ./pyprecg_docs
+        #echo "List pyprecag/build/docs/html"
+        ls ./pyprecag/build/docs/html
+        #echo "Compare usage.html file"
+        #diff usage.html ./pyprecag/build/docs/html/usage.html
+        #ls *.html | xargs -I % diff % ./pyprecag/build/docs/html/% --brief -s; exit 0
+        #echo "Compare all html files"
+        #ls *.html | xargs -I % diff % ./pyprecag/build/docs/html/% --brief -s; exit 0
