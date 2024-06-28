@@ -66,7 +66,12 @@ jobs:
         ls ./pyprecag_docs
     - name: Attempt to overwrite html files
       run: |
+        echo "git remove"
         git rm -r *
         cd ..        
+        echo "List pyprecag_docs html files"
+        ls ./pyprecag_docs
+        echo "Copy"
+        Copy-Item -Path .\pyprecag\build\docs\html* -Recurse -Destination .\pyprecag_docs -Verbos
         echo "List pyprecag_docs html files"
         ls ./pyprecag_docs
