@@ -1,4 +1,4 @@
-name: Checkout pyprecag on Ubuntu. Build html documents from pyprecag and commit any updates.
+name: Checkout pyprecag on Windows. Build html documents from pyprecag and commit any updates.
 
 on: 
     push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     strategy:
       max-parallel: 5
 
@@ -22,6 +22,26 @@ jobs:
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
+
+
+    - name: Install dependencies
+      run: |
+        C:\Miniconda\condabin\conda.bat env update --file environment.yml --name base
+        C:\Miniconda\condabin\conda.bat init powershell
+    - name: Lint with flake8
+      run: |
+        # Activate the base environment
+        C:\Miniconda\condabin\conda.bat activate base
+        C:\Miniconda\condabin\conda.bat install flake8
+        C:\Miniconda\condabin\conda.bat install gdal
+        C:\Miniconda\condabin\conda.bat install fiona
+        C:\Miniconda\condabin\conda.bat install geopandas
+        #conda install fiona
+        #conda install geopandas
+        pip install .
+
+
+
     - name: Install dependencies
       run: |
         conda install gdal
