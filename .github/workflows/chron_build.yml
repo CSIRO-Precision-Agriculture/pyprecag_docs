@@ -1,4 +1,4 @@
-name: Checkout pyprecag on Ubuntu. Build html documents from pyprecag and commit any updates.
+name: Checkout pyprecag on Windows. Build html documents from pyprecag and commit any updates.
 
 on: 
     push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     strategy:
       max-parallel: 5
 
