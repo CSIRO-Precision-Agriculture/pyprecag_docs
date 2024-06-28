@@ -72,6 +72,6 @@ jobs:
         echo "List pyprecag_docs html files"
         ls ./pyprecag_docs
         echo "Copy"
-        Copy-Item -Path .\pyprecag\build\docs\html* -Recurse -Destination .\pyprecag_docs -Verbos
+        Copy-Item -Path .\pyprecag\build\docs\html\* -Recurse -Destination .\pyprecag_docs -Verbos
         echo "List pyprecag_docs html files"
         ls ./pyprecag_docs
