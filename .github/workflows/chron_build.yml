@@ -44,5 +44,8 @@ jobs:
       run: |
         echo "List pyprecag/build/docs/html"
         ls ./pyprecag/build/docs/html
-        echo "Compare html files"
+        echo "Compare usage.html file"
+        diff usage.html ./pyprecag/build/docs/html/usage.html
+        ls *.html | xargs -I % diff % ./pyprecag/build/docs/html/% --brief -s; exit 0
+        echo "Compare all html files"
         ls *.html | xargs -I % diff % ./pyprecag/build/docs/html/% --brief -s; exit 0
