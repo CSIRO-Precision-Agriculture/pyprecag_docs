@@ -78,6 +78,9 @@ jobs:
         echo "Call a git diff"
         cd pyprecag_docs
         #git diff > diff.log
+        echo "Do a git config"
+        git config --global user.email "mike.birchall@csiro.au"
+        git config --global user.name "Mike Birchall"
         echo "Call a git add --all"
         git add --all
         echo "Call a git commit --all"
