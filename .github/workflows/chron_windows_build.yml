@@ -84,7 +84,7 @@ jobs:
         echo "Call a git add --all"
         git add --all
         echo "Call a git commit --all"
-        git commit --all
+        git commit --all -m "Auto Update"
         dir
     - name: Upload diff.log file as artifact
       uses: actions/upload-artifact@v4
