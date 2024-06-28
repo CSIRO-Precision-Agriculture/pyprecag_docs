@@ -37,10 +37,7 @@ jobs:
         C:\Miniconda\condabin\conda.bat install fiona
         C:\Miniconda\condabin\conda.bat install geopandas
         #conda install fiona
-        #conda install geopandas
-        pip install .\pyprecag
-
-
+        #conda install geopandas        
 
     - name: Install dependencies
       run: |
