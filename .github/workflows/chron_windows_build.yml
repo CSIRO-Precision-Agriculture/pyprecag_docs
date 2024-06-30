@@ -69,11 +69,12 @@ jobs:
         ls ./pyprecag_docs
     - name: Attempt to overwrite html files
       run: |
-        echo "git remove sphinx built directories"
-        git rm -r _modules
-        git rm -r _sources
-        git rm -r _static
-        git rm -r references
+        echo "Remove old sphinx built directories"
+        rm -r _modules
+        rm -r _sources
+        rm -r _static
+        rm -r references
+        rm -r .doctrees
         echo "git remove sphinx built html, js and objects.inv files"
         git rm *.html
         git rm *.js
