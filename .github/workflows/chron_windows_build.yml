@@ -4,6 +4,7 @@ on:
     push:
     schedule: ## Schedule to run at midnight
     - cron: '0 0 * * *'
+    - cron: '0 10 * * *'
 
 
 jobs:
@@ -22,6 +23,8 @@ jobs:
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
+        echo "Date:"
+        date
 
 
     - name: Install dependencies
@@ -66,10 +69,17 @@ jobs:
         ls ./pyprecag_docs
     - name: Attempt to overwrite html files
       run: |
-        echo "git remove"
-        git rm -r *
+        echo "git remove sphinx built directories"
+        git rm -r _modules
+        git rm -r _sources
+        git rm -r _static
+        git rm -r references
+        echo "git remove sphinx built html, js and objects.inv files"
+        git rm *.html
+        git rm *.js
+        git rm objects.inv
         cd ..        
-        echo "List pyprecag_docs html files"
+        echo "List pyprecag_docs html and related files"
         ls ./pyprecag_docs
         echo "Copy"
         Copy-Item -Path .\pyprecag\build\docs\html\* -Recurse -Destination .\pyprecag_docs -Verbos
