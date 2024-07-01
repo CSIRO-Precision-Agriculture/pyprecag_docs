@@ -4,7 +4,7 @@ on:
     push:
     schedule: ## Schedule to run at midnight
     - cron: '0 0 * * *'
-    - cron: '0 10 * * *'
+    - cron: '0 11 * * *'
 
 
 jobs:
@@ -69,12 +69,12 @@ jobs:
         ls ./pyprecag_docs
     - name: Attempt to overwrite html files
       run: |
-        echo "Remove old sphinx built directories"
-        rm -r _modules
-        rm -r _sources
-        rm -r _static
-        rm -r references
-        rm -r .doctrees
+        echo "Remove any old sphinx built directories"
+        if (Test-Path _modules  ) {rm -r _modules  }
+        if (Test_Path _sources  ) {rm -r _sources  }
+        if (Test-Path _static   ) {rm -r _static   }
+        if (Test-Path references) {rm -r references}
+        if (Test-Path .doctrees ) {rm -r .doctrees }
         echo "git remove sphinx built html, js and objects.inv files"
         git rm *.html
         git rm *.js
