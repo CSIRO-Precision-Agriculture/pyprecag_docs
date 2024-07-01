@@ -71,7 +71,7 @@ jobs:
       run: |
         echo "Remove any old sphinx built directories"
         if (Test-Path _modules  ) {rm -r _modules  }
-        if (Test_Path _sources  ) {rm -r _sources  }
+        if (Test-Path _sources  ) {rm -r _sources  }
         if (Test-Path _static   ) {rm -r _static   }
         if (Test-Path references) {rm -r references}
         if (Test-Path .doctrees ) {rm -r .doctrees }
